@@ -3,16 +3,21 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SacredGeometryGenerator : MonoBehaviour
 {
-    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Pyramid, StarTetrahedron }
+//TODO: Platonic solids, etc
+    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Cone, Pyramid, StarTetrahedron, FlowerOfLife }
 
     [SerializeField] private ShapeType Type = ShapeType.StarTetrahedron;
 
     [SerializeField] private float size = 1f;
+    [SerializeField] private float height = 2f;
+    [SerializeField] private float radius = 1f;
+    [SerializeField] private int numDivisions = 32;
     [SerializeField] private Material material;
 
     private MeshFilter meshFilter;
@@ -46,23 +51,35 @@ public class SacredGeometryGenerator : MonoBehaviour
                 meshFilter.mesh = GenerateCubeMesh(size);
                 break;
             case ShapeType.Sphere:
-                meshFilter.mesh = GenerateSphereMesh(size);
+                meshFilter.mesh = GenerateSphereMesh(radius);
                 break;
             case ShapeType.Cylinder:
-                meshFilter.mesh = GenerateCylinderMesh(size);
+                meshFilter.mesh = GenerateCylinderMesh(size, height, numDivisions);
                 break;
             case ShapeType.Capsule:
-                meshFilter.mesh = GenerateCapsuleMesh(size);
+                meshFilter.mesh = GenerateCapsuleMesh(radius, height, numDivisions);
+                break;
+            case ShapeType.Cone:
+                meshFilter.mesh = GenerateConeMesh(radius, height, numDivisions);
                 break;
             case ShapeType.Pyramid:
-                meshFilter.mesh = GeneratePyramidMesh(size, size);  //TODO: Height param
+                meshFilter.mesh = GeneratePyramidMesh(size, height);
                 break;
             case ShapeType.StarTetrahedron:
                 meshFilter.mesh = GenerateStarTetrahedronMesh(size);
                 break;
+            case ShapeType.FlowerOfLife:
+                meshFilter.mesh = GenerateFlowerOfLifeMesh(size);
+                break;
         }
     }
 
+    // This function generates a Mesh object representing a cube of the given size.
+    // The cube is created by defining an array of vertices and an array of triangles,
+    // and setting them on the Mesh object. The vertices are defined as eight corner points of the cube,
+    // with two adjacent corners forming a side of the cube. The triangles are defined as sets of three indices
+    // into the vertices array, forming the six faces of the cube. The function then recalculates the normals
+    // of the Mesh to ensure correct lighting, and returns the Mesh object.
     public static Mesh GenerateCubeMesh(float size)
     {
         Mesh mesh = new Mesh();
@@ -92,32 +109,271 @@ public class SacredGeometryGenerator : MonoBehaviour
             4, 0, 3, // Left
             4, 3, 7
         };
-
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        return mesh;
+    }
+    
+    // This implementation generates a sphere mesh by first dividing the sphere into a set of rings and dividing each ring into a set of vertices.
+    // It then generates triangles between adjacent vertices to form a grid of triangles that covers the sphere.
+    // The numDivisions parameter controls the resolution of the mesh.
+    // Higher values will produce a smoother sphere with more triangles.
+    public static Mesh GenerateSphereMesh(float radius)
+    {
+        Mesh mesh = new Mesh();
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+        int numDivisions = 8;
+
+        // Generate vertices
+        for (int i = 0; i <= numDivisions; i++)
+        {
+            float y = Mathf.Cos(Mathf.PI * i / numDivisions) * radius;
+            float ringRadius = Mathf.Sin(Mathf.PI * i / numDivisions) * radius;
+            for (int j = 0; j <= numDivisions; j++)
+            {
+                float x = Mathf.Cos(2 * Mathf.PI * j / numDivisions) * ringRadius;
+                float z = Mathf.Sin(2 * Mathf.PI * j / numDivisions) * ringRadius;
+                vertices.Add(new Vector3(x, y, z));
+            }
+        }
+
+        // Generate triangles
+        for (int i = 0; i < numDivisions; i++)
+        {
+            for (int j = 0; j < numDivisions; j++)
+            {
+                int first = (i * (numDivisions + 1)) + j;
+                int second = first + numDivisions + 1;
+                triangles.Add(first);
+                triangles.Add(second);
+                triangles.Add(first + 1);
+
+                triangles.Add(second);
+                triangles.Add(second + 1);
+                triangles.Add(first + 1);
+            }
+        }
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
 
         return mesh;
     }
 
-    public static Mesh GenerateSphereMesh(float size)
+//TODO: Cylinder doesn't work
+    // This function generates a cylinder mesh with a given radius, height, and number of segments.
+    // The mesh is represented as a list of vertices and a list of indices for the faces.
+    // The vertices are arranged in a circle around the base of the cylinder, another circle around the top,
+    // and two center points at the top and bottom. The faces are generated by connecting the vertices in a specific pattern.
+    public static Mesh GenerateCylinderMesh(float radius, float height, int numSegments)
     {
-        //TODO: Implement sphere mesh generation
-        return null;
+        Mesh mesh = new Mesh();
+
+        // Vertices
+        Vector3[] vertices = new Vector3[numSegments * 2 + 2];
+        float angleStep = 2 * Mathf.PI / numSegments;
+        float angle = 0f;
+        for (int i = 0; i <= numSegments; i++)
+        {
+            float x = Mathf.Cos(angle) * radius;
+            float z = Mathf.Sin(angle) * radius;
+            vertices[i] = new Vector3(x, height / 2f, z);
+            vertices[i + numSegments + 1] = new Vector3(x, -height / 2f, z);
+            angle += angleStep;
+        }
+
+        // Triangles
+        int[] triangles = new int[numSegments * 12];
+        int triangleIndex = 0;
+        for (int i = 0; i < numSegments; i++)
+        {
+            int baseIndex = i * 2;
+            int nextBaseIndex = ((i + 1) % numSegments) * 2;
+
+            // Side faces
+            triangles[triangleIndex++] = baseIndex;
+            triangles[triangleIndex++] = baseIndex + 1;
+            triangles[triangleIndex++] = nextBaseIndex + 1;
+
+            triangles[triangleIndex++] = baseIndex;
+            triangles[triangleIndex++] = nextBaseIndex + 1;
+            triangles[triangleIndex++] = nextBaseIndex;
+
+            // Top faces
+            triangles[triangleIndex++] = baseIndex + 1;
+            triangles[triangleIndex++] = vertices.Length - 2;
+            triangles[triangleIndex++] = nextBaseIndex + 1;
+
+            // Bottom faces
+            triangles[triangleIndex++] = baseIndex;
+            triangles[triangleIndex++] = nextBaseIndex;
+            triangles[triangleIndex++] = vertices.Length - 1;
+        }
+
+        // Normals
+        Vector3[] normals = new Vector3[vertices.Length];
+        for (int i = 0; i < numSegments; i++)
+        {
+            normals[i * 2] = normals[i * 2 + 1] = new Vector3(Mathf.Cos(i * angleStep), 0f, Mathf.Sin(i * angleStep));
+        }
+        normals[vertices.Length - 2] = Vector3.up;
+        normals[vertices.Length - 1] = Vector3.down;
+
+        // UVs
+        Vector2[] uvs = new Vector2[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            uvs[i] = new Vector2(vertices[i].x / radius * 0.5f + 0.5f, vertices[i].z / radius * 0.5f + 0.5f);
+        }
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.normals = normals;
+        mesh.uv = uvs;
+
+        return mesh;
     }
 
-    public static Mesh GenerateCylinderMesh(float size)
+//TODO: Capsule doesn't work
+    // Generates a capsule mesh with given size, using a sphere mesh for the rounded ends and a cylinder mesh for the middle.
+    public static Mesh GenerateCapsuleMesh(float radius, float height, int resolution)
     {
-        //TODO: Implement cylinder mesh generation
-        return null;
+        Mesh mesh = new Mesh();
+
+        // Define cylinder parameters
+        int nbSides = resolution;
+        int nbHeightSeg = resolution * 2;
+
+        // Compute angles and steps
+        float step = Mathf.PI / (float)nbHeightSeg;
+        float heightOffset = -height / 2f + radius;
+
+        // Generate vertices
+        List<Vector3> verticesList = new List<Vector3>();
+        for (int i = 0; i <= nbHeightSeg; i++)
+        {
+            float z = heightOffset + i * step;
+            float r = Mathf.Sqrt(radius * radius - Mathf.Pow(z, 2));
+            for (int j = 0; j <= nbSides; j++)
+            {
+                float x = r * Mathf.Cos(j * 2f * Mathf.PI / nbSides);
+                float y = r * Mathf.Sin(j * 2f * Mathf.PI / nbSides);
+                verticesList.Add(new Vector3(x, y, z));
+            }
+        }
+
+        // Generate triangles for top and bottom half-spheres
+        List<int> trianglesList = new List<int>();
+        int vertCount = nbSides + 1;
+        for (int i = 0; i < nbSides; i++)
+        {
+            trianglesList.Add(i);
+            trianglesList.Add(i + vertCount);
+            trianglesList.Add(i + vertCount + 1);
+
+            trianglesList.Add(i);
+            trianglesList.Add(i + vertCount + 1);
+            trianglesList.Add(i + 1);
+        }
+        int topVertIndex = verticesList.Count - vertCount;
+        int bottomVertIndex = vertCount;
+        for (int i = 0; i < nbSides; i++)
+        {
+            trianglesList.Add(topVertIndex + i + 1);
+            trianglesList.Add(topVertIndex + i);
+            trianglesList.Add(topVertIndex);
+
+            trianglesList.Add(bottomVertIndex + i);
+            trianglesList.Add(bottomVertIndex + i + 1);
+            trianglesList.Add(bottomVertIndex);
+        }
+
+        // Set mesh vertices, normals and triangles
+        mesh.vertices = verticesList.ToArray();
+
+        List<Vector3> normalsList = new List<Vector3>();
+        for (int i = 0; i < verticesList.Count; i++)
+        {
+            normalsList.Add((verticesList[i] - Vector3.zero).normalized);
+        }
+        mesh.normals = normalsList.ToArray();
+
+        mesh.triangles = trianglesList.ToArray();
+
+        return mesh;
     }
 
-    public static Mesh GenerateCapsuleMesh(float size)
+    // This implementation creates a cone mesh with the specified size, which consists of a bottom circle,
+    // a top vertex, and sides connecting the two.The mesh is generated using vertices, indices, and UV coordinates,
+    // which are then used to create the mesh object.
+    public static Mesh GenerateConeMesh(float radius, float height, int numDivisions)
     {
-        //TODO: Implement capsule mesh generation
-        return null;
+        Mesh mesh = new Mesh();
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> indices = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
+
+        // Create the bottom vertex
+        vertices.Add(Vector3.zero);
+        uvs.Add(new Vector2(0.5f, 0.5f));
+
+        // Create the side vertices
+        float size = radius * 2f;
+        float angleIncrement = (2f * Mathf.PI) / numDivisions;
+        for (int i = 0; i <= numDivisions; i++)
+        {
+            float angle = i * angleIncrement;
+            float x = Mathf.Cos(angle) * radius;
+            float z = Mathf.Sin(angle) * radius;
+            Vector3 vertex = new Vector3(x, 0f, z);
+            vertices.Add(vertex);
+            float u = (x / size) + 0.5f;
+            float v = (z / size) + 0.5f;
+            uvs.Add(new Vector2(u, v));
+        }
+
+        // Create the indices for the bottom and sides
+        for (int i = 1; i <= numDivisions; i++)
+        {
+            indices.Add(0);
+            indices.Add(i);
+            indices.Add(i + 1);
+        }
+
+        // Create the top vertex
+        vertices.Add(new Vector3(0f, height, 0f));
+        uvs.Add(new Vector2(0.5f, 0.5f));
+
+        // Create the indices for the top and sides
+        int topVertexIndex = vertices.Count - 1;
+        for (int i = 1; i <= numDivisions; i++)
+        {
+            int index = i == numDivisions ? 1 : i + 1;
+            indices.Add(index);
+            indices.Add(i);
+            indices.Add(topVertexIndex);
+        }
+
+        mesh.SetVertices(vertices);
+        mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+        mesh.SetUVs(0, uvs);
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        return mesh;
     }
 
+
+    // This function creates a mesh representing a pyramid with the given base size and height.
+    // The function first defines the vertices of the pyramid, including the apex and four base corners.
+    // Then, it defines the triangles of the pyramid, connecting the vertices to form the faces.
+    // The function also defines UVs for texturing the mesh and normals for lighting the mesh.
+    // Finally, the mesh is scaled to the given height, and the bounds and normals are recalculated before returning the generated mesh.
     public static Mesh GeneratePyramidMesh(float baseSize, float height)
     {
         var mesh = new Mesh();
@@ -180,6 +436,11 @@ public class SacredGeometryGenerator : MonoBehaviour
         return mesh;
     }
 
+//TODO: StarTetrahedron doesn't work
+    // Generates a mesh for a star tetrahedron shape. It creates a tetrahedron with an apex at the center of the shape
+    // and three base vertices that form an equilateral triangle. It then creates three pyramids by connecting the apex
+    // to each of the base vertices, and one more pyramid by connecting the base vertices to each other. Finally, it sets
+    // the normals of all faces to point upwards, and recalculates the bounds of the mesh
     public static Mesh GenerateStarTetrahedronMesh(float size)
     {
         Mesh mesh = new Mesh();
@@ -201,7 +462,7 @@ public class SacredGeometryGenerator : MonoBehaviour
             0, 2, 1, // Bottom pyramid
             0, 1, 3,
             1, 2, 3, // Front pyramid
-            0, 3, 2 // Back pyramid
+            2, 0, 3 // Back pyramid
         };
 
         Vector3[] normals = new Vector3[]
@@ -213,6 +474,85 @@ public class SacredGeometryGenerator : MonoBehaviour
         mesh.triangles = triangles;
         mesh.normals = normals;
         mesh.RecalculateBounds();
+
+        return mesh;
+    }
+
+//TODO: FoL doesn't work
+    // The Flower of Life mesh is generated using a series of circles with increasing radius,
+    // and each circle is divided into six segments. Points are added at the intersection of
+    // overlapping circles and at the intersection of every third circle. Triangles are then
+    // created between these points and the vertices on the two adjacent circles.
+    // The resulting mesh is then returned.
+    public static Mesh GenerateFlowerOfLifeMesh(float size)
+    {
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> indices = new List<int>();
+
+        // Constants used for Flower of Life generation
+        const float angleBetweenCircles = Mathf.PI / 6f;
+        const int numCircles = 6;
+        const int numPointsPerCircle = 6;
+
+        // Generate the first circle
+        vertices.Add(Vector3.zero);
+        for (int i = 0; i < numPointsPerCircle; i++)
+        {
+            float angle = i * Mathf.PI * 2f / numPointsPerCircle;
+            vertices.Add(new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * size);
+            indices.Add(0);
+            indices.Add(i + 1);
+            indices.Add((i + 1) % numPointsPerCircle + 1);
+        }
+
+        // Generate the remaining circles
+        for (int i = 1; i < numCircles; i++)
+        {
+            float radius = i * angleBetweenCircles * size;
+
+            for (int j = 0; j < numPointsPerCircle; j++)
+            {
+                float angle = j * Mathf.PI * 2f / numPointsPerCircle;
+                Vector3 center = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+
+                bool isOverlapCircle = i % 2 == 0 && j % 2 == 0;
+                bool isIntersectionPoint = i % 3 == 2 && j % 3 == 2;
+
+                if (isOverlapCircle || isIntersectionPoint)
+                {
+                    vertices.Add(center);
+                    int currentIndex = vertices.Count - 1;
+
+                    // Connect the new point to the six points on the previous circle
+                    int numPointsOnPrevCircle = numPointsPerCircle + (isOverlapCircle ? 0 : 1);
+                    int prevCircleStartIndex = vertices.Count - numPointsOnPrevCircle;
+                    for (int k = 0; k < numPointsOnPrevCircle; k++)
+                    {
+                        int nextIndex = prevCircleStartIndex + (k % numPointsPerCircle);
+                        indices.Add(currentIndex);
+                        indices.Add(nextIndex);
+                        indices.Add((nextIndex + 1) % numPointsOnPrevCircle + prevCircleStartIndex);
+                    }
+
+                    // Connect the new point to the six points on the current circle
+                    int currentCircleStartIndex = vertices.Count - numPointsPerCircle;
+                    for (int k = 0; k < numPointsPerCircle; k++)
+                    {
+                        int nextIndex = currentCircleStartIndex + k;
+                        indices.Add(currentIndex);
+                        indices.Add((nextIndex + 1) % numPointsPerCircle + currentCircleStartIndex);
+                        indices.Add(nextIndex);
+                    }
+                }
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(indices, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
 
         return mesh;
     }
