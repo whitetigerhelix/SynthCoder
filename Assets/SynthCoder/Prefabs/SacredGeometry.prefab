@@ -128,4 +128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0892dd2bdd4d27049b69f383b4466ddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Type: 5
   size: 1
+  material: {fileID: 2100000, guid: 7cbdbbdecadf5f24bb56728a2ffc0206, type: 2}
