@@ -10,7 +10,9 @@ using UnityEngine;
 public class SacredGeometryGenerator : MonoBehaviour
 {
 //TODO: Platonic solids, etc
-    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Cone, Pyramid, StarTetrahedron, FlowerOfLife }
+    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Cone, Pyramid, Torus, StarTetrahedron, FlowerOfLife }
+
+//TODO: Generate sacred shader effects
 
     [SerializeField] private ShapeType Type = ShapeType.StarTetrahedron;
 
@@ -64,6 +66,9 @@ public class SacredGeometryGenerator : MonoBehaviour
                 break;
             case ShapeType.Pyramid:
                 meshFilter.mesh = GeneratePyramidMesh(size, height);
+                break;
+            case ShapeType.Torus:
+                meshFilter.mesh = GenerateTorusMesh(radius, size);
                 break;
             case ShapeType.StarTetrahedron:
                 meshFilter.mesh = GenerateStarTetrahedronMesh(size);
@@ -435,6 +440,78 @@ public class SacredGeometryGenerator : MonoBehaviour
 
         return mesh;
     }
+
+    // This implementation generates a torus mesh with segments and sides number of segments in each direction.
+    // The radius parameter determines the overall radius of the torus, while the innerRadius parameter determines
+    // the radius of the inner part of the torus shape. The function first generates all the vertices and UV coordinates,
+    // and then uses them to generate the triangles for the mesh. Finally, the function recalculates the normals and bounds
+    // of the mesh and returns it.
+    public static Mesh GenerateTorusMesh(float radius, float innerRadius, int segments = 32, int sides = 32)
+    {
+        Mesh mesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[(segments + 1) * (sides + 1)];
+        Vector2[] uv = new Vector2[vertices.Length];
+        int[] triangles = new int[segments * sides * 6];
+
+        float segmentAngle = Mathf.PI * 2f / segments;
+        float sideAngle = Mathf.PI * 2f / sides;
+
+        int vertexIndex = 0;
+        int triangleIndex = 0;
+
+        // Generate vertices and UVs
+        for (int side = 0; side <= sides; side++)
+        {
+            float cosSide = Mathf.Cos(side * sideAngle);
+            float sinSide = Mathf.Sin(side * sideAngle);
+
+            for (int segment = 0; segment <= segments; segment++)
+            {
+                float cosSegment = Mathf.Cos(segment * segmentAngle);
+                float sinSegment = Mathf.Sin(segment * segmentAngle);
+
+                // Calculate position and UV coordinates
+                float x = (radius + innerRadius * cosSegment) * cosSide;
+                float y = innerRadius * sinSegment;
+                float z = (radius + innerRadius * cosSegment) * sinSide;
+                vertices[vertexIndex] = new Vector3(x, y, z);
+                uv[vertexIndex] = new Vector2((float)segment / segments, (float)side / sides);
+                vertexIndex++;
+            }
+        }
+
+        // Generate triangles
+        for (int side = 0; side < sides; side++)
+        {
+            for (int segment = 0; segment < segments; segment++)
+            {
+                int currentVertex = side * (segments + 1) + segment;
+                int nextVertex = currentVertex + segments + 1;
+
+                // First triangle
+                triangles[triangleIndex] = currentVertex;
+                triangles[triangleIndex + 1] = nextVertex;
+                triangles[triangleIndex + 2] = currentVertex + 1;
+
+                // Second triangle
+                triangles[triangleIndex + 3] = currentVertex + 1;
+                triangles[triangleIndex + 4] = nextVertex;
+                triangles[triangleIndex + 5] = nextVertex + 1;
+
+                triangleIndex += 6;
+            }
+        }
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.uv = uv;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        return mesh;
+    }
+
 
 //TODO: StarTetrahedron doesn't work
     // Generates a mesh for a star tetrahedron shape. It creates a tetrahedron with an apex at the center of the shape
