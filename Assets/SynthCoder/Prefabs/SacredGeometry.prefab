@@ -101,7 +101,7 @@ MonoBehaviour:
   height: 2
   radius: 1.5
   numDivisions: 32
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &397059692
 GameObject:
   m_ObjectHideFlags: 0
@@ -203,7 +203,7 @@ MonoBehaviour:
   height: 2
   radius: 1.5
   numDivisions: 32
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &451966189
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,7 +305,7 @@ MonoBehaviour:
   height: 0
   radius: 0
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &481410596
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,7 +407,7 @@ MonoBehaviour:
   height: 2
   radius: 0
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &520826941
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,7 +509,7 @@ MonoBehaviour:
   height: 0
   radius: 1.5
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &1077359354
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,7 +611,7 @@ MonoBehaviour:
   height: 0
   radius: 1.5
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &1262169991
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,7 +713,7 @@ MonoBehaviour:
   height: 0
   radius: 0
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &1374090876
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,7 +815,7 @@ MonoBehaviour:
   height: 2
   radius: 0
   numDivisions: 32
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &5693300678102381966
 GameObject:
   m_ObjectHideFlags: 0
@@ -972,4 +972,4 @@ MonoBehaviour:
   height: 0
   radius: 0
   numDivisions: 0
-  material: {fileID: 2100000, guid: 71e595beb65b389429f1fa26cbccbefb, type: 2}
+  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
