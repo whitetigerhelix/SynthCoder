@@ -23,13 +23,22 @@ Shader "SynthCoder/Colorful"
         CGPROGRAM
         #pragma surface surf Standard
 
+        float fract(float x) { return x - floor(x); }
+        float4 mod289(float4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        float3 mod289(float3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        float2 mod289(float2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        float4 permute(float4 x) { return ((x * 34.0) + 1.0) * mod289(x); } //{ return ((x * 34.0) + 1.0) * x; }
+        float3 permute(float3 x) { return ((x * 34.0) + 1.0) * mod289(x); }
+        float4 taylorInvSqrt(float4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+        float3 taylorInvSqrt(float3 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
         struct Input
         {
             float2 uv_MainTex;
+            float4 _Color;
+            float _Glossiness;
+            float _Metallic;
         };
-
-        float4 permute(float4 x) { return ((x * 34.0) + 1.0) * x; }
-        float4 taylorInvSqrt(float4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
         // This implementation of the noise function is adapted from the book "The Book of Shaders" by Patricio Gonzalez Vivo and Jen Lowe.
         float noise(float2 P)
@@ -39,7 +48,8 @@ Shader "SynthCoder/Colorful"
             float2 x0 = P - i + dot(i, C.xx);
             float2 i1;
             i1 = (x0.x > x0.y) ? float2(1.0, 0.0) : float2(0.0, 1.0);
-            float4 x12 = x0.xyxy + float4(C.xx, C.yy, C.xx, C.yy);
+            float4 x12 = float4(x0.xy, x0.xy);
+            x12 = x12 + float4(C.x, C.y, C.x, C.y); // This line adds a small offset to the coordinates to help break up any symmetry in the noise.
             x12.xy -= i1;
             i = mod289(i);
             float3 p = permute(permute(i.y + float3(0.0, i1.y, 1.0)) + i.x + float3(0.0, i1.x, 1.0));
@@ -59,9 +69,9 @@ Shader "SynthCoder/Colorful"
 
         void surf(Input IN, inout SurfaceOutputStandard o) 
         {
-            o.Albedo = _Color.rgb;
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
+            o.Albedo = IN._Color.rgb;
+            o.Metallic = IN._Metallic;
+            o.Smoothness = IN._Glossiness;
 
             // Use a Perlin noise function to create a colorful pattern
             float r = noise(IN.uv_MainTex * 5.0);
