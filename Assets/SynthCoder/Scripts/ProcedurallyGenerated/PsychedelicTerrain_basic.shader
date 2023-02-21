@@ -3,7 +3,7 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
-Shader "Custom/PsychedelicTerrain" {
+Shader "SynthCoder/PsychedelicTerrain" {
     Properties {
         _MainTex ("Terrain Texture", 2D) = "white" {}
         _Amplitude ("Amplitude", Range(0, 1)) = 0.1

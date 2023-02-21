@@ -3,7 +3,7 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
-Shader "Custom/Psychedelic" {
+Shader "SynthCoder/Psychedelic" {
     Properties{
         _MainTex("Texture", 2D) = "white" {}
         _Speed("Speed", Range(0.1, 10.0)) = 1.0
