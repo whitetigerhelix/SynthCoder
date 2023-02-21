@@ -46,6 +46,8 @@ public class SkyboxGenerator_ProceduralTexture : MonoBehaviour
         }
         gradientTexture.Apply();
 
+        TextureGenerator.ExportTextureToFile(gradientTexture, "Assets/SynthCoder/Resources/ProceduralTextures/SkyboxGradientTexture.asset");
+
         // Create the skybox material
         DestroyImmediate(skyboxMaterial);
         skyboxMaterial = new Material(Shader.Find("Skybox/Procedural"));
