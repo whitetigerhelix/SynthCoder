@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class SkyboxGenerator_ProceduralTexture : MonoBehaviour
 {
     [Header("Skybox Settings")]
