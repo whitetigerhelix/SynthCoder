@@ -200,8 +200,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 3
   size: 0
-  height: 2
-  radius: 1.5
+  height: 4
+  radius: 0.75
   numDivisions: 32
   material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &451966189
@@ -609,8 +609,8 @@ MonoBehaviour:
   Type: 1
   size: 0
   height: 0
-  radius: 1.5
-  numDivisions: 0
+  radius: 2
+  numDivisions: 64
   material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &1262169991
 GameObject:
@@ -811,9 +811,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 2
-  size: 3
-  height: 2
-  radius: 0
+  size: 0
+  height: 3
+  radius: 1
   numDivisions: 32
   material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &5693300678102381966
