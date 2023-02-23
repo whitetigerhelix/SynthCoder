@@ -301,10 +301,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 8
-  size: 3
+  size: 0.15
   height: 0
-  radius: 0
-  numDivisions: 0
+  radius: 0.75
+  numDivisions: 32
   material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
 --- !u!1 &481410596
 GameObject:
@@ -713,7 +713,7 @@ MonoBehaviour:
   height: 0
   radius: 0
   numDivisions: 0
-  material: {fileID: 2100000, guid: 38eeafd80f4d87b499cb250791fa5e63, type: 2}
+  material: {fileID: 2100000, guid: 90223354409de7f4aadf6ef40744e2da, type: 2}
 --- !u!1 &1374090876
 GameObject:
   m_ObjectHideFlags: 0

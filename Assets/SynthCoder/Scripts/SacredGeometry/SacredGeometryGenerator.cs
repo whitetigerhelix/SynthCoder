@@ -631,17 +631,24 @@ public class SacredGeometryGenerator : MonoBehaviour
             7, 11, 12
         };
 
-        // Calculate normals for each triangle face
-        Vector3[] normals = new Vector3[triangles.Length];
+        // Calculate normals for each vertex
+        Vector3[] normals = new Vector3[vertices.Length];
         for (int i = 0; i < triangles.Length; i += 3)
         {
-            Vector3 v1 = vertices[triangles[i]];
-            Vector3 v2 = vertices[triangles[i + 1]];
-            Vector3 v3 = vertices[triangles[i + 2]];
+            int i1 = triangles[i];
+            int i2 = triangles[i + 1];
+            int i3 = triangles[i + 2];
+            Vector3 v1 = vertices[i1];
+            Vector3 v2 = vertices[i2];
+            Vector3 v3 = vertices[i3];
             Vector3 normal = Vector3.Cross(v2 - v1, v3 - v1).normalized;
-            normals[i] = normal;
-            normals[i + 1] = normal;
-            normals[i + 2] = normal;
+            normals[i1] += normal;
+            normals[i2] += normal;
+            normals[i3] += normal;
+        }
+        for (int i = 0; i < normals.Length; i++)
+        {
+            normals[i] = normals[i].normalized;
         }
 
         mesh.vertices = vertices;
