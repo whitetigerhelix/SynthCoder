@@ -3,6 +3,10 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
+
+//TODO: This doesn't work quite right yet - only is solid color of _Color1
+
+
 // This shader creates a dynamic skybox that changes color and shape over time. 
 // It takes in parameters for speed, scale, and three colors. 
 // The skybox is created using simplex noise, which generates a pattern of colors and shapes. 

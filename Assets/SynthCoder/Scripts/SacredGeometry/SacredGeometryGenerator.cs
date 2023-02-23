@@ -242,71 +242,87 @@ public class SacredGeometryGenerator : MonoBehaviour
         return mesh;
     }
 
-//TODO: Capsule doesn't work
+    //TODO: Capsule doesn't work
     // Generates a capsule mesh with given size, using a sphere mesh for the rounded ends and a cylinder mesh for the middle.
-    public static Mesh GenerateCapsuleMesh(float radius, float height, int resolution)
+    public static Mesh GenerateCapsuleMesh(float radius, float height, int nbSides)
     {
         Mesh mesh = new Mesh();
 
-        // Define cylinder parameters
-        int nbSides = resolution;
-        int nbHeightSeg = resolution * 2;
-
         // Compute angles and steps
-        float step = Mathf.PI / (float)nbHeightSeg;
-        float heightOffset = -height / 2f + radius;
+        float halfHeight = height / 2f;
+        int nbHeightSeg = Mathf.RoundToInt(nbSides * height / (2 * radius));
+        float angleStep = Mathf.PI / nbHeightSeg;
+        float sideStep = Mathf.PI * 2f / nbSides;
 
         // Generate vertices
         List<Vector3> verticesList = new List<Vector3>();
+        List<Vector3> normalsList = new List<Vector3>();
+        List<Vector2> uvList = new List<Vector2>();
         for (int i = 0; i <= nbHeightSeg; i++)
         {
-            float z = heightOffset + i * step;
-            float r = Mathf.Sqrt(radius * radius - Mathf.Pow(z, 2));
+            float h = Mathf.Clamp((i * height / nbHeightSeg) - halfHeight, -halfHeight, halfHeight);
+            float r = Mathf.Sqrt(radius * radius - h * h);
             for (int j = 0; j <= nbSides; j++)
             {
-                float x = r * Mathf.Cos(j * 2f * Mathf.PI / nbSides);
-                float y = r * Mathf.Sin(j * 2f * Mathf.PI / nbSides);
-                verticesList.Add(new Vector3(x, y, z));
+                float angle = j * sideStep;
+                Vector3 vertexPos;
+                if (i < nbHeightSeg / 2)
+                {
+                    vertexPos = new Vector3(Mathf.Sin(angle) * r, Mathf.Cos(angle) * r, h + halfHeight - radius);
+                }
+                else
+                {
+                    vertexPos = new Vector3(Mathf.Sin(angle) * r, Mathf.Cos(angle) * r, h - halfHeight + radius);
+                }
+                verticesList.Add(vertexPos);
+                normalsList.Add(vertexPos.normalized);
+                uvList.Add(new Vector2(j / (float)nbSides, i / (float)nbHeightSeg));
             }
         }
 
-        // Generate triangles for top and bottom half-spheres
+        // Generate triangles
         List<int> trianglesList = new List<int>();
-        int vertCount = nbSides + 1;
-        for (int i = 0; i < nbSides; i++)
+        int nbVerticesPerCircle = nbSides + 1;
+        for (int i = 0; i < nbHeightSeg; i++)
         {
-            trianglesList.Add(i);
-            trianglesList.Add(i + vertCount);
-            trianglesList.Add(i + vertCount + 1);
-
-            trianglesList.Add(i);
-            trianglesList.Add(i + vertCount + 1);
-            trianglesList.Add(i + 1);
+            for (int j = 0; j < nbSides; j++)
+            {
+                int vertexIndex = i * nbVerticesPerCircle + j;
+                if (i == 0)
+                {
+                    int nextIndex = vertexIndex + 1;
+                    trianglesList.Add(nextIndex);
+                    trianglesList.Add(vertexIndex);
+                    trianglesList.Add(nbVerticesPerCircle * (nbHeightSeg + 1) - nbVerticesPerCircle + j);
+                }
+                else if (i == nbHeightSeg - 1)
+                {
+                    int nextIndex = vertexIndex + 1;
+                    trianglesList.Add(nextIndex);
+                    trianglesList.Add(vertexIndex);
+                    trianglesList.Add(nbVerticesPerCircle * nbHeightSeg + j);
+                }
+                else
+                {
+                    int nextIndex = vertexIndex + 1;
+                    int nextCircleIndex = vertexIndex + nbVerticesPerCircle;
+                    int nextCircleNextIndex = nextCircleIndex + 1;
+                    trianglesList.Add(vertexIndex);
+                    trianglesList.Add(nextIndex);
+                    trianglesList.Add(nextCircleIndex);
+                    trianglesList.Add(nextCircleIndex);
+                    trianglesList.Add(nextIndex);
+                    trianglesList.Add(nextCircleNextIndex);
+                }
+            }
         }
-        int topVertIndex = verticesList.Count - vertCount;
-        int bottomVertIndex = vertCount;
-        for (int i = 0; i < nbSides; i++)
-        {
-            trianglesList.Add(topVertIndex + i + 1);
-            trianglesList.Add(topVertIndex + i);
-            trianglesList.Add(topVertIndex);
 
-            trianglesList.Add(bottomVertIndex + i);
-            trianglesList.Add(bottomVertIndex + i + 1);
-            trianglesList.Add(bottomVertIndex);
-        }
-
-        // Set mesh vertices, normals and triangles
         mesh.vertices = verticesList.ToArray();
-
-        List<Vector3> normalsList = new List<Vector3>();
-        for (int i = 0; i < verticesList.Count; i++)
-        {
-            normalsList.Add((verticesList[i] - Vector3.zero).normalized);
-        }
         mesh.normals = normalsList.ToArray();
-
+        mesh.uv = uvList.ToArray();
         mesh.triangles = trianglesList.ToArray();
+
+        mesh.RecalculateBounds();
 
         return mesh;
     }
@@ -491,12 +507,12 @@ public class SacredGeometryGenerator : MonoBehaviour
 
                 // First triangle
                 triangles[triangleIndex] = currentVertex;
-                triangles[triangleIndex + 1] = nextVertex;
-                triangles[triangleIndex + 2] = currentVertex + 1;
+                triangles[triangleIndex + 1] = currentVertex + 1;
+                triangles[triangleIndex + 2] = nextVertex;
 
                 // Second triangle
-                triangles[triangleIndex + 3] = currentVertex + 1;
-                triangles[triangleIndex + 4] = nextVertex;
+                triangles[triangleIndex + 3] = nextVertex;
+                triangles[triangleIndex + 4] = currentVertex + 1;
                 triangles[triangleIndex + 5] = nextVertex + 1;
 
                 triangleIndex += 6;
