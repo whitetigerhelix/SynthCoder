@@ -9,10 +9,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SacredGeometryGenerator : MonoBehaviour
 {
-//TODO: Platonic solids, etc
-    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Cone, Pyramid, Torus, StarTetrahedron, FlowerOfLife }
+//TODO: Idea: Generate sacred shader effects, material
 
-//TODO: Generate sacred shader effects
+//TODO: More shapes: Platonic solids, etc
+    public enum ShapeType { Cube, Sphere, Cylinder, Capsule, Cone, Pyramid, Torus, StarTetrahedron, FlowerOfLife }
 
     [SerializeField] private ShapeType Type = ShapeType.StarTetrahedron;
 
@@ -536,8 +536,7 @@ public class SacredGeometryGenerator : MonoBehaviour
         return mesh;
     }
 
-
-//TODO: StarTetrahedron doesn't work
+//TODO: StarTetrahedron isn't working quite right yet - it's a bit malformed
     // Generates a mesh for a star tetrahedron shape. It creates a tetrahedron with an apex at the center of the shape
     // and three base vertices that form an equilateral triangle. It then creates three pyramids by connecting the apex
     // to each of the base vertices, and one more pyramid by connecting the base vertices to each other. Finally, it sets
@@ -548,32 +547,98 @@ public class SacredGeometryGenerator : MonoBehaviour
 
         float root2 = Mathf.Sqrt(2f);
         float root3 = Mathf.Sqrt(3f);
-        float root6 = Mathf.Sqrt(6f);
 
         Vector3[] vertices = new Vector3[]
         {
-            new Vector3(0f, size / (2f * root3), 0f), // Apex
-            new Vector3(-size / (2f * root2), 0f, size / (2f * root3)), // Base vertex 1
-            new Vector3(size / (2f * root2), 0f, size / (2f * root3)), // Base vertex 2
-            new Vector3(0f, -size / root3, 0f) // Base vertex 3
+            // Base vertices of the tetrahedron
+            new Vector3(-size / (2f * root2), 0f, size / (2f * root3)),
+            new Vector3(size / (2f * root2), 0f, size / (2f * root3)),
+            new Vector3(0f, 0f, -size / root3),
+
+            // Apex of the tetrahedron
+            new Vector3(0f, size / (2f * root3), 0f),
+
+            // Base vertices of the pyramid connected to the first base vertex
+            new Vector3(-size / (2f * root2), size / root3, size / (2f * root3)),
+            new Vector3(-size / root2, 0f, 0f),
+            new Vector3(0f, size / root3, 0f),
+
+            // Base vertices of the pyramid connected to the second base vertex
+            new Vector3(size / root2, 0f, 0f),
+            new Vector3(size / (2f * root2), size / root3, size / (2f * root3)),
+            new Vector3(0f, size / root3, 0f),
+
+            // Base vertices of the pyramid connected to the third base vertex
+            new Vector3(-size / (2f * root2), size / root3, -size / (2f * root3)),
+            new Vector3(size / (2f * root2), size / root3, -size / (2f * root3)),
+            new Vector3(0f, size / root3, 0f),
         };
 
         int[] triangles = new int[]
         {
-            0, 2, 1, // Bottom pyramid
+            // Bottom pyramid
+            0, 2, 1,
             0, 1, 3,
-            1, 2, 3, // Front pyramid
-            2, 0, 3 // Back pyramid
+            1, 2, 3,
+            2, 0, 3,
+
+            // Pyramid connected to the first base vertex
+            4, 6, 5,
+            5, 6, 3,
+            6, 4, 3,
+            4, 5, 7,
+            3, 6, 7,
+            5, 3, 7,
+
+            // Pyramid connected to the second base vertex
+            7, 8, 5,
+            5, 8, 3,
+            8, 7, 3,
+            7, 10, 8,
+            3, 8, 10,
+            5, 3, 10,
+
+            // Pyramid connected to the third base vertex
+            9, 11, 10,
+            10, 11, 3,
+            11, 9, 3,
+            9, 10, 12,
+            3, 11, 12,
+            10, 3, 12,
+
+            // Pyramid connecting all base vertices
+            0, 1, 5,
+            1, 8, 5,
+            1, 2, 8,
+            2, 10, 8,
+            2, 0, 10,
+            0, 5, 10,
+            7, 9, 11,
+            9, 10, 11,
+            10, 12, 11,
+            10, 5, 12,
+            5, 7, 12,
+            7, 11, 12
         };
 
-        Vector3[] normals = new Vector3[]
+        // Calculate normals for each triangle face
+        Vector3[] normals = new Vector3[triangles.Length];
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            Vector3.up, Vector3.up, Vector3.up, Vector3.up // All faces point up
-        };
+            Vector3 v1 = vertices[triangles[i]];
+            Vector3 v2 = vertices[triangles[i + 1]];
+            Vector3 v3 = vertices[triangles[i + 2]];
+            Vector3 normal = Vector3.Cross(v2 - v1, v3 - v1).normalized;
+            normals[i] = normal;
+            normals[i + 1] = normal;
+            normals[i + 2] = normal;
+        }
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.normals = normals;
+
+        // Recalculate bounds
         mesh.RecalculateBounds();
 
         return mesh;
