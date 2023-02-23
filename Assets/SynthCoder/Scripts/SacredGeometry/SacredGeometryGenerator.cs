@@ -4,6 +4,7 @@
 // Stay curious and keep coding!
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -24,14 +25,24 @@ public class SacredGeometryGenerator : MonoBehaviour
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+    private GameObject flowerOfLifeContainer;
 
     private void OnEnable()
     {
         GenerateSacredGeometry();
     }
 
+    private void OnDisable()
+    {
+        DestroyImmediate(flowerOfLifeContainer);
+        flowerOfLifeContainer = null;
+    }
+
     private void GenerateSacredGeometry()
     {
+        DestroyImmediate(flowerOfLifeContainer);
+        flowerOfLifeContainer = null;
+
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
 
@@ -44,7 +55,6 @@ public class SacredGeometryGenerator : MonoBehaviour
         {
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
-
         meshRenderer.material = material;
 
         switch (Type)
@@ -74,7 +84,7 @@ public class SacredGeometryGenerator : MonoBehaviour
                 meshFilter.mesh = GenerateStarTetrahedronMesh(size);
                 break;
             case ShapeType.FlowerOfLife:
-                meshFilter.mesh = GenerateFlowerOfLifeMesh(size);
+                GenerateFlowerOfLifeAsync();
                 break;
         }
     }
@@ -644,82 +654,62 @@ public class SacredGeometryGenerator : MonoBehaviour
         return mesh;
     }
 
-//TODO: FoL doesn't work
-    // The Flower of Life mesh is generated using a series of circles with increasing radius,
-    // and each circle is divided into six segments. Points are added at the intersection of
-    // overlapping circles and at the intersection of every third circle. Triangles are then
-    // created between these points and the vertices on the two adjacent circles.
-    // The resulting mesh is then returned.
-    public static Mesh GenerateFlowerOfLifeMesh(float size)
+//TODO: GenerateFlowerOfLife3DMesh - use spheres instead of torus
+//TODO: The generated flower of life isn't quite right, but looks fairly cool
+    // This function defines a list of positions for the centers of the circles in the flower of life,
+    // and then loops through each position, creating a torus mesh using the GenerateTorusMesh function
+    // and adding it as a child to a parent game object.
+    // The resulting parent game object is returned as the output of the function.
+    public static GameObject GenerateFlowerOfLife(float radius, float innerRadius, Material material, int segments = 32, int sides = 32)
     {
-        List<Vector3> vertices = new List<Vector3>();
-        List<int> indices = new List<int>();
+        // Define the positions of the centers of the circles in the flower of life
+        var positions = new List<Vector3>();
+        positions.Add(Vector3.zero); // Center of the first circle
+        positions.Add(new Vector3(radius * 2f, 0f, 0f)); // Center of the second circle
+        positions.Add(new Vector3(radius, 0f, radius * Mathf.Sqrt(3))); // Center of the third circle
+        positions.Add(new Vector3(-radius, 0f, radius * Mathf.Sqrt(3))); // Center of the fourth circle
+        positions.Add(new Vector3(-radius * 2f, 0f, 0f)); // Center of the fifth circle
+        positions.Add(new Vector3(-radius, 0f, -radius * Mathf.Sqrt(3))); // Center of the sixth circle
+        positions.Add(new Vector3(radius, 0f, -radius * Mathf.Sqrt(3))); // Center of the seventh circle
 
-        // Constants used for Flower of Life generation
-        const float angleBetweenCircles = Mathf.PI / 6f;
-        const int numCircles = 6;
-        const int numPointsPerCircle = 6;
+        // Create a parent game object to hold all of the torus game objects
+        var parentObject = new GameObject("Flower of Life Container");
 
-        // Generate the first circle
-        vertices.Add(Vector3.zero);
-        for (int i = 0; i < numPointsPerCircle; i++)
+        // Loop through each position and create a torus mesh
+        foreach (var position in positions)
         {
-            float angle = i * Mathf.PI * 2f / numPointsPerCircle;
-            vertices.Add(new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * size);
-            indices.Add(0);
-            indices.Add(i + 1);
-            indices.Add((i + 1) % numPointsPerCircle + 1);
+            var torus = GenerateTorusMesh(radius, innerRadius, segments, sides);
+
+            // Create a child game object to hold the torus mesh
+            var childObject = new GameObject("Torus");
+            childObject.transform.parent = parentObject.transform;
+            childObject.transform.position = position;
+            childObject.AddComponent<MeshFilter>().mesh = torus;
+            var meshRenderer = childObject.AddComponent<MeshRenderer>();
+            meshRenderer.material = material;
         }
 
-        // Generate the remaining circles
-        for (int i = 1; i < numCircles; i++)
+        return parentObject;
+    }
+
+    // Can't parent the meshes until the following frame
+    public async void GenerateFlowerOfLifeAsync()
+    {
+        flowerOfLifeContainer = GenerateFlowerOfLife(radius, size, material, numDivisions, numDivisions);
+
+        await Task.Yield(); // Wait a frame
+
+        flowerOfLifeContainer.transform.parent = gameObject.transform;
+        flowerOfLifeContainer.transform.localPosition = Vector3.zero;
+        flowerOfLifeContainer.transform.localRotation = Quaternion.identity;
+    }
+
+    public static void DeleteChildren(GameObject obj)
+    {
+        for (int i = obj.transform.childCount - 1; i >= 0; i--)
         {
-            float radius = i * angleBetweenCircles * size;
-
-            for (int j = 0; j < numPointsPerCircle; j++)
-            {
-                float angle = j * Mathf.PI * 2f / numPointsPerCircle;
-                Vector3 center = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
-
-                bool isOverlapCircle = i % 2 == 0 && j % 2 == 0;
-                bool isIntersectionPoint = i % 3 == 2 && j % 3 == 2;
-
-                if (isOverlapCircle || isIntersectionPoint)
-                {
-                    vertices.Add(center);
-                    int currentIndex = vertices.Count - 1;
-
-                    // Connect the new point to the six points on the previous circle
-                    int numPointsOnPrevCircle = numPointsPerCircle + (isOverlapCircle ? 0 : 1);
-                    int prevCircleStartIndex = vertices.Count - numPointsOnPrevCircle;
-                    for (int k = 0; k < numPointsOnPrevCircle; k++)
-                    {
-                        int nextIndex = prevCircleStartIndex + (k % numPointsPerCircle);
-                        indices.Add(currentIndex);
-                        indices.Add(nextIndex);
-                        indices.Add((nextIndex + 1) % numPointsOnPrevCircle + prevCircleStartIndex);
-                    }
-
-                    // Connect the new point to the six points on the current circle
-                    int currentCircleStartIndex = vertices.Count - numPointsPerCircle;
-                    for (int k = 0; k < numPointsPerCircle; k++)
-                    {
-                        int nextIndex = currentCircleStartIndex + k;
-                        indices.Add(currentIndex);
-                        indices.Add((nextIndex + 1) % numPointsPerCircle + currentCircleStartIndex);
-                        indices.Add(nextIndex);
-                    }
-                }
-            }
+            GameObject childObject = obj.transform.GetChild(i).gameObject;
+            DestroyImmediate(childObject);
         }
-
-        Mesh mesh = new Mesh();
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(indices, 0);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-
-        return mesh;
     }
 }
