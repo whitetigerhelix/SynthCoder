@@ -25,7 +25,7 @@ public class SacredGeometryGenerator : MonoBehaviour
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
-    private GameObject flowerOfLifeContainer;
+    private GameObject container;
 
     private void OnEnable()
     {
@@ -34,14 +34,14 @@ public class SacredGeometryGenerator : MonoBehaviour
 
     private void OnDisable()
     {
-        DestroyImmediate(flowerOfLifeContainer);
-        flowerOfLifeContainer = null;
+        DestroyImmediate(container);
+        container = null;
     }
 
     private void GenerateSacredGeometry()
     {
-        DestroyImmediate(flowerOfLifeContainer);
-        flowerOfLifeContainer = null;
+        DestroyImmediate(container);
+        container = null;
 
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
@@ -81,7 +81,8 @@ public class SacredGeometryGenerator : MonoBehaviour
                 meshFilter.mesh = GenerateTorusMesh(radius, size);
                 break;
             case ShapeType.StarTetrahedron:
-                meshFilter.mesh = GenerateStarTetrahedronMesh(size);
+                //meshFilter.mesh = GenerateStarTetrahedronMesh(size);
+                GenerateStarTetrahedronAsync();
                 break;
             case ShapeType.FlowerOfLife:
                 GenerateFlowerOfLifeAsync();
@@ -545,7 +546,7 @@ public class SacredGeometryGenerator : MonoBehaviour
 
         return mesh;
     }
-
+/*
 //TODO: StarTetrahedron isn't working quite right yet - it's a bit malformed
     // Generates a mesh for a star tetrahedron shape. It creates a tetrahedron with an apex at the center of the shape
     // and three base vertices that form an equilateral triangle. It then creates three pyramids by connecting the apex
@@ -660,6 +661,56 @@ public class SacredGeometryGenerator : MonoBehaviour
 
         return mesh;
     }
+*/
+//TODO: This version of star tetrahedron also doesn't work very well
+    // Use pyramid mesh generation
+    public static GameObject GenerateStarTetrahedron(float size, Material material)
+    {
+        GameObject starTetrahedron = new GameObject("Star Tetrahedron");
+
+        float root2 = Mathf.Sqrt(2f);
+        float root3 = Mathf.Sqrt(3f);
+        float apexHeight = size / (2f * root3);
+
+        // Generate four pyramids for the tetrahedron base
+        for (int i = 0; i < 4; i++)
+        {
+            GameObject pyramid = new GameObject("Pyramid " + (i + 1));
+            pyramid.transform.parent = starTetrahedron.transform;
+
+            MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = pyramid.AddComponent<MeshRenderer>();
+            meshRenderer.material = material;
+
+            // Generate pyramid mesh
+            Mesh pyramidMesh = GeneratePyramidMesh(size / root2, apexHeight);
+            meshFilter.mesh = pyramidMesh;
+
+            // Rotate pyramid to align with tetrahedron geometry
+            pyramid.transform.RotateAround(Vector3.zero, Vector3.up, i * 90f);
+
+            // Invert odd numbered pyramids to create the star tetrahedron shape
+            if (i % 2 == 1)
+            {
+                meshRenderer.material.color = Color.red;
+                meshFilter.mesh = InvertMesh(pyramidMesh);
+            }
+        }
+
+        return starTetrahedron;
+    }
+
+    // Can't parent the meshes until the following frame
+    public async void GenerateStarTetrahedronAsync()
+    {
+        container = GenerateStarTetrahedron(size, material);
+
+        await Task.Yield(); // Wait a frame
+
+        container.transform.parent = gameObject.transform;
+        container.transform.localPosition = Vector3.zero;
+        container.transform.localRotation = Quaternion.identity;
+    }
 
 //TODO: GenerateFlowerOfLife3DMesh - use spheres instead of torus
 //TODO: The generated flower of life isn't quite right, but looks fairly cool
@@ -702,13 +753,54 @@ public class SacredGeometryGenerator : MonoBehaviour
     // Can't parent the meshes until the following frame
     public async void GenerateFlowerOfLifeAsync()
     {
-        flowerOfLifeContainer = GenerateFlowerOfLife(radius, size, material, numDivisions, numDivisions);
+        container = GenerateFlowerOfLife(radius, size, material, numDivisions, numDivisions);
 
         await Task.Yield(); // Wait a frame
 
-        flowerOfLifeContainer.transform.parent = gameObject.transform;
-        flowerOfLifeContainer.transform.localPosition = Vector3.zero;
-        flowerOfLifeContainer.transform.localRotation = Quaternion.identity;
+        container.transform.parent = gameObject.transform;
+        container.transform.localPosition = Vector3.zero;
+        container.transform.localRotation = Quaternion.identity;
+    }
+
+    // This function takes in a Mesh object and returns a new inverted Mesh object.
+    // It first creates new arrays for the inverted vertices and normals, and then
+    // loops through each vertex to invert its position and normal. It also reverses the
+    // triangle winding order to maintain proper surface orientation. Finally, it assigns
+    // the new arrays to the inverted mesh, recalculates its bounds and tangents, and returns it.
+    public static Mesh InvertMesh(Mesh originalMesh)
+    {
+        Mesh invertedMesh = new Mesh();
+
+        // Create new arrays for inverted vertices and normals
+        Vector3[] invertedVertices = new Vector3[originalMesh.vertexCount];
+        Vector3[] invertedNormals = new Vector3[originalMesh.vertexCount];
+
+        // Invert vertex positions and normals
+        for (int i = 0; i < originalMesh.vertexCount; i++)
+        {
+            invertedVertices[i] = originalMesh.vertices[i] * -1f;
+            invertedNormals[i] = originalMesh.normals[i] * -1f;
+        }
+
+        // Reverse the triangle winding order to maintain proper surface orientation
+        int[] invertedTriangles = new int[originalMesh.triangles.Length];
+        for (int i = 0; i < originalMesh.triangles.Length; i += 3)
+        {
+            invertedTriangles[i] = originalMesh.triangles[i + 2];
+            invertedTriangles[i + 1] = originalMesh.triangles[i + 1];
+            invertedTriangles[i + 2] = originalMesh.triangles[i];
+        }
+
+        // Assign new arrays to inverted mesh
+        invertedMesh.vertices = invertedVertices;
+        invertedMesh.triangles = invertedTriangles;
+        invertedMesh.normals = invertedNormals;
+
+        // Recalculate bounds and tangents
+        invertedMesh.RecalculateBounds();
+        invertedMesh.RecalculateTangents();
+
+        return invertedMesh;
     }
 
     public static void DeleteChildren(GameObject obj)
