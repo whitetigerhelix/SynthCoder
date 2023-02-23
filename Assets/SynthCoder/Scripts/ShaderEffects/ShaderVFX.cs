@@ -20,6 +20,8 @@ public class ShaderVFX : MonoBehaviour
     Texture2D dynamicTexture;
     Color[] colors;
 
+    private string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
+
     private void OnEnable()
     {
         CreateSphere();
@@ -43,6 +45,9 @@ public class ShaderVFX : MonoBehaviour
         GenerateTexture();
     }
 
+    // This function generates a new Texture2D with the given dimensions, generates colors for each pixel using Perlin noise,
+    // sets the pixels of the texture, assigns the texture to a shader, and exports the texture to a file. If a previous texture exists,
+    // it is destroyed before creating the new one.
     public void GenerateTexture(int width = 256, int height = 256)
     {
         if (dynamicTexture == null)
@@ -72,5 +77,7 @@ public class ShaderVFX : MonoBehaviour
 
         // Assign the dynamic texture to the shader
         sphere.GetComponent<Renderer>().material.SetTexture("_MainTex", dynamicTexture);
+
+        TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
     }
 }

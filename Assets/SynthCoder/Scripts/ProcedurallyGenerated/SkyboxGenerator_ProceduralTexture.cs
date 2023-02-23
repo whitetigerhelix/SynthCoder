@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class SkyboxGenerator_ProceduralTexture : MonoBehaviour
 {
     [Header("Skybox Settings")]
@@ -45,6 +45,8 @@ public class SkyboxGenerator_ProceduralTexture : MonoBehaviour
             gradientTexture.SetPixel(0, i, Color.Lerp(middleColor, bottomColor, t));
         }
         gradientTexture.Apply();
+
+        TextureGenerator.ExportTextureToFile(gradientTexture, "Assets/SynthCoder/Resources/ProceduralTextures/SkyboxGradientTexture.asset");
 
         // Create the skybox material
         DestroyImmediate(skyboxMaterial);

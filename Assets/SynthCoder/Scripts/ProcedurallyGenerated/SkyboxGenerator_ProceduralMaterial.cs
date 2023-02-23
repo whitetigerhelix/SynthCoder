@@ -6,7 +6,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class SkyboxGenerator_Material : MonoBehaviour
+public class SkyboxGenerator_ProceduralMaterial : MonoBehaviour
 {
     [Tooltip("Color at the top of the skybox")]
     public Color topColor = new Color(0.5f, 0.7f, 1.0f, 1.0f);
