@@ -662,7 +662,7 @@ public class SacredGeometryGenerator : MonoBehaviour
         return mesh;
     }
 */
-//TODO: This version of star tetrahedron also doesn't work very well
+//TODO: This version of star tetrahedron looks cool but still isn't quite right
     // Use pyramid mesh generation
     public static GameObject GenerateStarTetrahedron(float size, Material material)
     {
@@ -671,9 +671,10 @@ public class SacredGeometryGenerator : MonoBehaviour
         float root2 = Mathf.Sqrt(2f);
         float root3 = Mathf.Sqrt(3f);
         float apexHeight = size / (2f * root3);
+        float baseSize = size / root2;
 
-        // Generate four pyramids for the tetrahedron base
-        for (int i = 0; i < 4; i++)
+        // Generate two pyramids for the tetrahedron
+        for (int i = 0; i < 2; i++)
         {
             GameObject pyramid = new GameObject("Pyramid " + (i + 1));
             pyramid.transform.parent = starTetrahedron.transform;
@@ -683,19 +684,22 @@ public class SacredGeometryGenerator : MonoBehaviour
             meshRenderer.material = material;
 
             // Generate pyramid mesh
-            Mesh pyramidMesh = GeneratePyramidMesh(size / root2, apexHeight);
+            Mesh pyramidMesh = GeneratePyramidMesh(baseSize, apexHeight);
             meshFilter.mesh = pyramidMesh;
 
             // Rotate pyramid to align with tetrahedron geometry
-            pyramid.transform.RotateAround(Vector3.zero, Vector3.up, i * 90f);
+            pyramid.transform.Rotate(Vector3.right, 180f * i);
 
             // Invert odd numbered pyramids to create the star tetrahedron shape
             if (i % 2 == 1)
             {
-                meshRenderer.material.color = Color.red;
+                meshRenderer.material.color = Color.red;    //TODO: Handy for debugging, but shouldn't change the color like this
                 meshFilter.mesh = InvertMesh(pyramidMesh);
             }
         }
+
+        // Rotate one pyramid to form the diamond shape
+        starTetrahedron.transform.GetChild(1).Rotate(Vector3.up, 36.8699f);
 
         return starTetrahedron;
     }
