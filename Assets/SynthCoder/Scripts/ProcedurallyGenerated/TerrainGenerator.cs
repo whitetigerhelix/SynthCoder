@@ -28,26 +28,34 @@ public class TerrainGenerator : MonoBehaviour
 
     public Shader terrainShader;
 
-    private Mesh terrainMesh;
-    private Material terrainMaterial;
-    private Texture2D terrainTexture;
-    private Texture2D gradientTexture;
-    private Texture2D noiseTexture;
-    private string terrainTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/TerrainTexture.asset";
-    private string gradientTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/GradientTexture.asset";
-    private string noiseTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/NoiseTexture.asset";
+    protected Mesh terrainMesh;
+    protected MeshRenderer terrainRenderer;
+    protected MeshFilter terrainMeshFilter;
+    protected Material terrainMaterial;
+    protected Texture2D terrainTexture;
+    protected Texture2D gradientTexture;
+    protected Texture2D noiseTexture;
+    protected string terrainTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/TerrainTexture.asset";
+    protected string gradientTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/GradientTexture.asset";
+    protected string noiseTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/NoiseTexture.asset";
 
-    private void OnEnable()
+    protected void Awake()
+    {
+        terrainRenderer = GetComponent<MeshRenderer>();
+        terrainMeshFilter = GetComponent<MeshFilter>();
+    }
+
+    protected void OnEnable()
     {
         GenerateTerrain();
     }
 
-    private void GenerateTerrain()
+    protected void GenerateTerrain()
     {
         // Create the terrain
         DestroyImmediate(terrainMesh);
         terrainMesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = terrainMesh;
+        terrainMeshFilter.mesh = terrainMesh;
 
         // Generate terrain information
         int numVertices = terrainWidth * terrainDepth;
@@ -98,7 +106,7 @@ public class TerrainGenerator : MonoBehaviour
         // Update terrain material and textures
         DestroyImmediate(terrainMaterial);
         terrainMaterial = new Material(terrainShader);
-        GetComponent<MeshRenderer>().material = terrainMaterial;
+        terrainRenderer.material = terrainMaterial;
 
         DestroyImmediate(terrainTexture);
         terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
