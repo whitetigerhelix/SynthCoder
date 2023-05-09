@@ -19,14 +19,16 @@ namespace SynthCoder
         public Material sphereMaterial;
         public bool castShadows = false;    // Set during CreateSphere
 
-        private GameObject sphere;
-        private Renderer sphereRenderer;
+        protected GameObject sphere;
+        protected MeshFilter meshFilter;
+        protected Mesh sphereMesh => meshFilter.mesh;
+        protected Renderer sphereRenderer;
         public Material RendererMaterial => sphereRenderer.material;
 
-        Texture2D dynamicTexture;
-        Color32[] colors;
+        protected Texture2D dynamicTexture;
+        protected Color32[] colors;
 
-        private string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
+        protected string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
 
         [Header("Shader Configuration")]
 
@@ -42,29 +44,32 @@ namespace SynthCoder
         public Color Color2 = new Color(1f, 0f, 0.5f, 1f);
         public Color Color3 = new Color(1f, 1f, 0f, 1f);
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             CreateSphere();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             Destroy(sphere);
             sphere = null;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             UpdateShader();
         }
 
-        private void CreateSphere()
+        protected virtual void CreateSphere()
         {
             sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.transform.SetParent(transform);
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localRotation = Quaternion.identity;
             sphere.transform.localScale = new Vector3(sphereRadius, sphereRadius, sphereRadius);
+
+            // Get the MeshFilter component and mesh from the sphere
+            meshFilter = sphere.GetComponent<MeshFilter>();
 
             // Create a new instance of the material and assign it to the sphere
             sphereRenderer = sphere.GetComponent<Renderer>();
@@ -74,11 +79,10 @@ namespace SynthCoder
             GenerateTexture();
         }
 
-
         // This function generates a new Texture2D with the given dimensions, generates colors for each pixel using Perlin noise,
         // sets the pixels of the texture, assigns the texture to a shader, and exports the texture to a file. If a previous texture exists,
         // it is destroyed before creating the new one.
-        public void GenerateTexture(int width = 256, int height = 256)
+        public virtual void GenerateTexture(int width = 256, int height = 256)
         {
             if (dynamicTexture == null)
             {
@@ -111,7 +115,7 @@ namespace SynthCoder
             TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
         }
 
-        private void UpdateShader()
+        protected virtual void UpdateShader()
         {
             if (RendererMaterial != null)
             {

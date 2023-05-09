@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8001561610336816057}
-  - component: {fileID: 5052322873527675153}
+  - component: {fileID: 3432042440483462086}
   m_Layer: 0
   m_Name: MusicBall
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5052322873527675153
+--- !u!114 &3432042440483462086
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 992617450491540251}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b2845b418bcf9c46a323ed614bf55cd, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a505753f3b283d40a1612af565bf760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sphereRadius: 2
@@ -54,3 +54,8 @@ MonoBehaviour:
   Color1: {r: 1, g: 0.5, b: 0, a: 1}
   Color2: {r: 1, g: 0, b: 0.5, a: 1}
   Color3: {r: 1, g: 1, b: 0, a: 1}
+  numRings: 10
+  numSegments: 20
+  amplitude: 1
+  frequency: 1
+  damping: 0.5
