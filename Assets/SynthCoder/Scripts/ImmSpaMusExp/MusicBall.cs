@@ -11,13 +11,21 @@ namespace SynthCoder
     {
         [Header("Music Ball")]
         public int numRings = 10;
-        public int numSegments = 20;
         public float amplitude = 1.0f;
         public float frequency = 1.0f;
         public float damping = 0.5f;
+        public float noiseScale = 1.0f;
+        public float noiseSpeed = 1.0f;
 
         private Vector3[] originalVertices;
         private Vector3[] displacedVertices;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            UpdateMusicBall();
+        }
 
         protected override void CreateSphere()
         {
@@ -26,13 +34,6 @@ namespace SynthCoder
             // Create arrays to store the original and displaced vertices
             originalVertices = sphereMesh.vertices;
             displacedVertices = new Vector3[originalVertices.Length];
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            UpdateMusicBall();
         }
 
         private void UpdateMusicBall()
@@ -52,9 +53,11 @@ namespace SynthCoder
 
                 // Calculate the distance of the vertex from the center of the sphere
                 float distanceFromCenter = Vector3.Distance(vertex, Vector3.zero);
+                distanceFromCenter *= sphereRadius;
 
                 // Calculate the amount to displace the vertex based on the distance from the center and the displacement amount
-                float displacementAmount = displacement * Mathf.Clamp01((distanceFromCenter - sphereRadius) / (sphereRadius * numRings));
+                float noiseValue = Mathf.PerlinNoise((vertex.x + Time.time * noiseSpeed) * noiseScale, (vertex.y + Time.time * noiseSpeed) * noiseScale);
+                float displacementAmount = displacement * Mathf.Clamp01((sphereRadius - distanceFromCenter) / (sphereRadius * numRings)) * noiseValue;
 
                 // Apply damping to the displacement amount to make the effect look smoother
                 displacementAmount *= Mathf.Pow(damping, Time.deltaTime);

@@ -73,7 +73,10 @@ namespace SynthCoder
 
             // Create a new instance of the material and assign it to the sphere
             sphereRenderer = sphere.GetComponent<Renderer>();
-            sphereRenderer.material = new Material(sphereMaterial);
+            if (sphereMaterial != null)
+            {
+                sphereRenderer.material = new Material(sphereMaterial);
+            }
             sphereRenderer.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
 
             GenerateTexture();
