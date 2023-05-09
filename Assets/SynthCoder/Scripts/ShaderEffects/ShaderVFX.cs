@@ -4,6 +4,7 @@
 // Stay curious and keep coding!
 
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SynthCoder
 {
@@ -16,13 +17,30 @@ namespace SynthCoder
     {
         public float sphereRadius = 1.0f;
         public Material sphereMaterial;
+        public bool castShadows = false;    // Set during CreateSphere
 
         private GameObject sphere;
+        private Renderer sphereRenderer;
+        public Material RendererMaterial => sphereRenderer.material;
 
         Texture2D dynamicTexture;
         Color32[] colors;
 
         private string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
+
+        [Header("Shader Configuration")]
+
+        [Range(0.1f, 10f)]
+        public float Speed = 1f;
+        [Range(1f, 10f)]
+        public float Scale = 1f;
+        [Range(0.1f, 10f)]
+        public float Distortion = 1f;
+        [Range(0.1f, 10f)]
+        public float DistortionSpeed = 1f;
+        public Color Color1 = new Color(1f, 0.5f, 0f, 1f);
+        public Color Color2 = new Color(1f, 0f, 0.5f, 1f);
+        public Color Color3 = new Color(1f, 1f, 0f, 1f);
 
         private void OnEnable()
         {
@@ -35,6 +53,11 @@ namespace SynthCoder
             sphere = null;
         }
 
+        private void Update()
+        {
+            UpdateShader();
+        }
+
         private void CreateSphere()
         {
             sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -42,10 +65,15 @@ namespace SynthCoder
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localRotation = Quaternion.identity;
             sphere.transform.localScale = new Vector3(sphereRadius, sphereRadius, sphereRadius);
-            sphere.GetComponent<Renderer>().material = sphereMaterial;
+
+            // Create a new instance of the material and assign it to the sphere
+            sphereRenderer = sphere.GetComponent<Renderer>();
+            sphereRenderer.material = new Material(sphereMaterial);
+            sphereRenderer.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
 
             GenerateTexture();
         }
+
 
         // This function generates a new Texture2D with the given dimensions, generates colors for each pixel using Perlin noise,
         // sets the pixels of the texture, assigns the texture to a shader, and exports the texture to a file. If a previous texture exists,
@@ -78,9 +106,23 @@ namespace SynthCoder
             dynamicTexture.Apply();
 
             // Assign the dynamic texture to the shader
-            sphere.GetComponent<Renderer>().material.SetTexture("_MainTex", dynamicTexture);
+            RendererMaterial.SetTexture("_MainTex", dynamicTexture);
 
             TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
+        }
+
+        private void UpdateShader()
+        {
+            if (RendererMaterial != null)
+            {
+                RendererMaterial.SetFloat("_Speed", Speed);
+                RendererMaterial.SetFloat("_Scale", Scale);
+                RendererMaterial.SetFloat("_Distortion", Distortion);
+                RendererMaterial.SetFloat("_DistortionSpeed", DistortionSpeed);
+                RendererMaterial.SetColor("_Color1", Color1);
+                RendererMaterial.SetColor("_Color2", Color2);
+                RendererMaterial.SetColor("_Color3", Color3);
+            }
         }
     }
 }

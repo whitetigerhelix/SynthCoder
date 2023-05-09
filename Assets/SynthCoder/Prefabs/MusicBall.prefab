@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8001561610336816057}
   - component: {fileID: 5052322873527675153}
   m_Layer: 0
-  m_Name: PsychedelicSphere
+  m_Name: MusicBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,10 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sphereRadius: 2
   sphereMaterial: {fileID: 2100000, guid: 7cbdbbdecadf5f24bb56728a2ffc0206, type: 2}
-  Speed: 1
+  castShadows: 0
+  Speed: 4.44
   Scale: 1
-  Distortion: 1
-  DistortionSpeed: 1
+  Distortion: 0.1
+  DistortionSpeed: 4.44
   Color1: {r: 1, g: 0.5, b: 0, a: 1}
   Color2: {r: 1, g: 0, b: 0.5, a: 1}
   Color3: {r: 1, g: 1, b: 0, a: 1}
