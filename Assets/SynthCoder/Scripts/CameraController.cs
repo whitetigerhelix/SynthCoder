@@ -5,59 +5,62 @@
 
 using UnityEngine;
 
-public sealed class CameraController : MonoBehaviour
+namespace SynthCoder
 {
-    public float speed = 5.0f;
-    public float sensitivity = 2.0f;
-
-    private bool isLooking = false;
-    public bool IsLooking => isLooking;
-
-    float xRotation = 0f;
-    float yRotation = 0f;
-
-    private void Start()
+    public sealed class CameraController : MonoBehaviour
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
+        public float speed = 5.0f;
+        public float sensitivity = 2.0f;
 
-    private void Update()
-    {
-        // Move the camera based on WSAD + QE keys
-        float x = Input.GetAxis("Horizontal");
-        float y = 0f;
-        if (Input.GetKey(KeyCode.E))
+        private bool isLooking = false;
+        public bool IsLooking => isLooking;
+
+        float xRotation = 0f;
+        float yRotation = 0f;
+
+        private void Start()
         {
-            y = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
-        else if (Input.GetKey(KeyCode.Q))
+
+        private void Update()
         {
-            y = -1f;
-        }
-        float z = Input.GetAxis("Vertical");
+            // Move the camera based on WSAD + QE keys
+            float x = Input.GetAxis("Horizontal");
+            float y = 0f;
+            if (Input.GetKey(KeyCode.E))
+            {
+                y = 1f;
+            }
+            else if (Input.GetKey(KeyCode.Q))
+            {
+                y = -1f;
+            }
+            float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.up * y + transform.forward * z;
+            Vector3 move = transform.right * x + transform.up * y + transform.forward * z;
 
-        transform.position += speed * Time.deltaTime * move;
+            transform.position += speed * Time.deltaTime * move;
 
-        // Look around using the mouse when the right mouse button is pressed
-        if (Input.GetMouseButton(1))
-        {
-            isLooking = true;
-            float mouseX = Input.GetAxis("Mouse X") * sensitivity;
-            float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+            // Look around using the mouse when the right mouse button is pressed
+            if (Input.GetMouseButton(1))
+            {
+                isLooking = true;
+                float mouseX = Input.GetAxis("Mouse X") * sensitivity;
+                float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
-            xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+                xRotation -= mouseY;
+                xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-            yRotation += mouseX;
+                yRotation += mouseX;
 
-            transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
-        }
-        else
-        {
-            isLooking = false;
+                transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
+            }
+            else
+            {
+                isLooking = false;
+            }
         }
     }
 }

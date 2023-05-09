@@ -5,12 +5,15 @@
 
 using UnityEngine;
 
-public class SkyboxGenerator_SetMaterial : MonoBehaviour
+namespace SynthCoder
 {
-    public Material skyboxMaterial;
-
-    private void OnEnable()
+    public class SkyboxGenerator_SetMaterial : MonoBehaviour
     {
-        RenderSettings.skybox = skyboxMaterial;
+        public Material skyboxMaterial;
+
+        private void OnEnable()
+        {
+            RenderSettings.skybox = skyboxMaterial;
+        }
     }
 }

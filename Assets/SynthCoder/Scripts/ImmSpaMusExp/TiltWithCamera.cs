@@ -5,35 +5,38 @@
 
 using UnityEngine;
 
-public class TiltWithCamera : MonoBehaviour
+namespace SynthCoder
 {
-    public float minXRotation = -30f;
-    public float maxXRotation = 30f;
-    public float minZRotation = -30f;
-    public float maxZRotation = 30f;
-    public bool constrainToCameraYaw = false;
-
-    private Camera mainCamera => Camera.main;
-
-    public Vector2 Direction => new Vector2(mainCamera.transform.forward.x, mainCamera.transform.forward.z);
-
-    private void Update()
+    public class TiltWithCamera : MonoBehaviour
     {
-        if (mainCamera != null)
+        public float minXRotation = -30f;
+        public float maxXRotation = 30f;
+        public float minZRotation = -30f;
+        public float maxZRotation = 30f;
+        public bool constrainToCameraYaw = false;
+
+        private Camera mainCamera => Camera.main;
+
+        public Vector2 Direction => new Vector2(mainCamera.transform.forward.x, mainCamera.transform.forward.z);
+
+        private void Update()
         {
-            // Get camera rotation
-            float cameraXRotation = mainCamera.transform.rotation.eulerAngles.x;
-            float cameraYRotation = mainCamera.transform.rotation.eulerAngles.y;
+            if (mainCamera != null)
+            {
+                // Get camera rotation
+                float cameraXRotation = mainCamera.transform.rotation.eulerAngles.x;
+                float cameraYRotation = mainCamera.transform.rotation.eulerAngles.y;
 
-            // Calculate new rotation based on camera pitch
-            Quaternion newRotation = Quaternion.Euler(
-                Mathf.Clamp(cameraXRotation, minXRotation, maxXRotation),
-                constrainToCameraYaw ? cameraYRotation : transform.rotation.eulerAngles.y,
-                Mathf.Clamp(cameraXRotation, minZRotation, maxZRotation)
-            );
+                // Calculate new rotation based on camera pitch
+                Quaternion newRotation = Quaternion.Euler(
+                    Mathf.Clamp(cameraXRotation, minXRotation, maxXRotation),
+                    constrainToCameraYaw ? cameraYRotation : transform.rotation.eulerAngles.y,
+                    Mathf.Clamp(cameraXRotation, minZRotation, maxZRotation)
+                );
 
-            // Update object rotation
-            transform.rotation = newRotation;
+                // Update object rotation
+                transform.rotation = newRotation;
+            }
         }
     }
 }
