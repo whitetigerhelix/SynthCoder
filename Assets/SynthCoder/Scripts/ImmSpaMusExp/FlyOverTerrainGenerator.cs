@@ -16,7 +16,7 @@ public class FlyOverTerrainGenerator : TerrainGenerator
 
     public Vector2 ScrollDirection => cameraTilt != null ? cameraTilt.Direction : scrollDirection;
 
-    public Vector2 ScrollOffset => ScrollDirection * Time.time * scrollSpeed;
+    public Vector2 ScrollOffset => scrollSpeed * Time.time * ScrollDirection;
 
     protected override void Update()
     {

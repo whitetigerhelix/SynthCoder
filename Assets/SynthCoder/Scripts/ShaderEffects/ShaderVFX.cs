@@ -18,7 +18,7 @@ public class ShaderVFX : MonoBehaviour
     private GameObject sphere;
     
     Texture2D dynamicTexture;
-    Color[] colors;
+    Color32[] colors;
 
     private string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
 
@@ -59,7 +59,7 @@ public class ShaderVFX : MonoBehaviour
         dynamicTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
         // Generate colors for each pixel in the texture
-        colors = new Color[width * height];
+        colors = new Color32[width * height];
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -67,12 +67,12 @@ public class ShaderVFX : MonoBehaviour
                 float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
                 float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
                 float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
-                colors[x + y * width] = new Color(r, g, b, 1.0f);
-            }
+                colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
+			}
         }
 
         // Set the texture pixels
-        dynamicTexture.SetPixels(colors);
+        dynamicTexture.SetPixels32(colors);
         dynamicTexture.Apply();
 
         // Assign the dynamic texture to the shader

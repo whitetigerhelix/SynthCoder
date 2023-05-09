@@ -15,8 +15,8 @@ public static class TextureGenerator
     // The frequency parameter controls the level of detail in the noise. The resulting texture is returned.
     public static Texture2D GenerateTerrainTexture(int width = 512, int height = 512, float frequency = 0.0075f)
     {
-        Texture2D terrainTexture = new Texture2D(width, height);
-        Color[] colors = new Color[width * height];
+        Texture2D terrainTexture = new(width, height);
+        Color32[] colors = new Color32[width * height];
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -25,16 +25,16 @@ public static class TextureGenerator
                 colors[y * width + x] = new Color(0f, noise, 0f, 1f);
             }
         }
-        terrainTexture.SetPixels(colors);
+        terrainTexture.SetPixels32(colors);
         terrainTexture.Apply();
         return terrainTexture;
     }
 
     // This function generates a texture with a gradient between two colors. The width and height of the texture can be specified.
-    public static Texture2D GenerateGradientTexture(Color gradientStartColor, Color gradientEndColor, int width = 512, int height = 512)
+    public static Texture2D GenerateGradientTexture(Color32 gradientStartColor, Color32 gradientEndColor, int width = 512, int height = 512)
     {
-        Texture2D gradientTexture = new Texture2D(width, height);
-        Color[] pixels = new Color[width * height];
+        Texture2D gradientTexture = new(width, height);
+        Color32[] pixels = new Color32[width * height];
 
         // Loop through the pixels and set their colors based on their position
         for (int x = 0; x < width; x++)
@@ -42,10 +42,10 @@ public static class TextureGenerator
             for (int y = 0; y < height; y++)
             {
                 float t = (float)y / height;
-                pixels[x + y * width] = Color.Lerp(gradientStartColor, gradientEndColor, t);
+                pixels[x + y * width] = Color32.Lerp(gradientStartColor, gradientEndColor, t);
             }
         }
-        gradientTexture.SetPixels(pixels);
+        gradientTexture.SetPixels32(pixels);
         gradientTexture.Apply();
         return gradientTexture;
     }
@@ -58,10 +58,10 @@ public static class TextureGenerator
     public static Texture2D GenerateNoiseTexture(int width = 512, int height = 512)
     {
         // Create a new Texture2D with the desired dimensions
-        Texture2D noiseTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        Texture2D noiseTexture = new(width, height, TextureFormat.RGBA32, false);
 
         // Generate colors for each pixel in the texture
-        var colors = new Color[width * height];
+        var colors = new Color32[width * height];
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -69,12 +69,12 @@ public static class TextureGenerator
                 float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
                 float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
                 float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
-                colors[x + y * width] = new Color(r, g, b, 1.0f);
+                colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
             }
         }
 
         // Set the texture pixels
-        noiseTexture.SetPixels(colors);
+        noiseTexture.SetPixels32(colors);
         noiseTexture.Apply();
 
         return noiseTexture;
@@ -86,7 +86,7 @@ public static class TextureGenerator
     {
 #if UNITY_EDITOR
         // Create a new RenderTexture with the same dimensions as the procedural texture
-        RenderTexture renderTexture = new RenderTexture(proceduralTexture.width, proceduralTexture.height, 0);
+        RenderTexture renderTexture = new(proceduralTexture.width, proceduralTexture.height, 0);
 
         // Set the active RenderTexture to the new RenderTexture
         RenderTexture.active = renderTexture;
@@ -95,7 +95,7 @@ public static class TextureGenerator
         Graphics.Blit(proceduralTexture, renderTexture);
 
         // Create a new Texture2D to read the pixels of the RenderTexture
-        Texture2D savedTexture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+        Texture2D savedTexture = new(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
 
         // Read the pixels of the RenderTexture into the new Texture2D
         savedTexture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);

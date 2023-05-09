@@ -39,7 +39,7 @@ public sealed class CameraController : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.up * y + transform.forward * z;
 
-        transform.position += move * speed * Time.deltaTime;
+        transform.position += speed * Time.deltaTime * move;
 
         // Look around using the mouse when the right mouse button is pressed
         if (Input.GetMouseButton(1))
