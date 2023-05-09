@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7297834344395120451}
+  m_Father: {fileID: 816654483090913369}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1841091931677377288
@@ -98,14 +98,73 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terrainWidth: 150
   terrainDepth: 150
-  heightScale: 8
-  heightMultiplier: 8
+  heightScale: 10
+  heightMultiplier: 25
   heightNoiseOffset: {x: 0, y: 0}
   terrainTextureFrequency: 0.0075
   gradientStartColor: {r: 1, g: 0, b: 0, a: 1}
   gradientEndColor: {r: 0, g: 0, b: 1, a: 1}
   terrainShader: {fileID: 4800000, guid: cf45ea1af4841d14eab78631cd90835c, type: 3}
-  ScrollDirection: {x: 1, y: 0}
+  amplitude: 0.95
+  frequency: 8
+  speed: 0.58
+  distortion: 0.35
+  color1: {r: 0.6, g: 0.007, b: 0.007, a: 1}
+  color2: {r: 0.04, g: 0, b: 1, a: 1}
+  color3: {r: 1, g: 0.37, b: 0, a: 1}
+  scrollDirection: {x: 1, y: 1}
+  scrollSpeed: 50
+  cameraTilt: {fileID: 0}
+--- !u!1 &4555493204109562373
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 816654483090913369}
+  - component: {fileID: 1008759589742106112}
+  m_Layer: 0
+  m_Name: CameraTilt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &816654483090913369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4555493204109562373}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 220759769145468913}
+  m_Father: {fileID: 7297834344395120451}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1008759589742106112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4555493204109562373}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1084d9e52ecb3904ba506e643b4f1757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minXRotation: -30
+  maxXRotation: 30
+  minZRotation: -30
+  maxZRotation: 30
+  constrainToCameraYaw: 0
 --- !u!1 &4571688670141927366
 GameObject:
   m_ObjectHideFlags: 0
@@ -130,11 +189,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4571688670141927366}
   m_LocalRotation: {x: -0.04557069, y: -0.38109204, z: 0.018875927, w: 0.9232204}
-  m_LocalPosition: {x: -7, y: -20, z: -70}
+  m_LocalPosition: {x: -7, y: -30, z: -70}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 220759769145468913}
+  - {fileID: 816654483090913369}
   m_Father: {fileID: 9161252195246602810}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -4, y: -45, z: 4}

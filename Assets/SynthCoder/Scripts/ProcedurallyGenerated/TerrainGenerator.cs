@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class TerrainGenerator : MonoBehaviour
 {
-    [Header("Terrain")]
+    [Header("Terrain Configuration")]
 
     public int terrainWidth = 32;
     public int terrainDepth = 32;
@@ -17,9 +17,11 @@ public class TerrainGenerator : MonoBehaviour
     public float heightMultiplier = 8f;
     public Vector2 heightNoiseOffset = Vector2.zero;
 
-    [Header("Texture")]
+    [Header("Terrain Texture Generation")]
 
     public float terrainTextureFrequency = 0.0075f;
+
+    [Header("Gradient Texture Generation")]
 
     public Color gradientStartColor = Color.red;
     public Color gradientEndColor = Color.blue;
@@ -27,6 +29,18 @@ public class TerrainGenerator : MonoBehaviour
     [Header("Shader")]
 
     public Shader terrainShader;
+
+    [Range(0f, 1f)]
+    public float amplitude = 0.95f;
+    [Range(0f, 10f)]
+    public float frequency = 8f;
+    [Range(-1f, 1f)]
+    public float speed = 0.58f;
+    [Range(0f, 1f)]
+    public float distortion = 0.35f;
+    public Color color1 = new Color(0.6f, 0.007f, 0.007f, 1f);
+    public Color color2 = new Color(0.04f, 0f, 1f, 1f);
+    public Color color3 = new Color(1f, 0.37f, 0f, 1f);
 
     protected Mesh terrainMesh;
     protected MeshRenderer terrainRenderer;
@@ -39,18 +53,37 @@ public class TerrainGenerator : MonoBehaviour
     protected string gradientTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/GradientTexture.asset";
     protected string noiseTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/NoiseTexture.asset";
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         terrainRenderer = GetComponent<MeshRenderer>();
         terrainMeshFilter = GetComponent<MeshFilter>();
     }
 
-    protected void OnEnable()
+    protected virtual void OnEnable()
     {
         GenerateTerrain();
     }
 
-    protected void GenerateTerrain()
+    protected virtual void Update()
+    {
+        UpdateShader();
+    }
+
+    protected virtual void UpdateShader()
+    {
+        if (terrainMaterial != null)
+        {
+            terrainMaterial.SetFloat("_Amplitude", amplitude);
+            terrainMaterial.SetFloat("_Frequency", frequency);
+            terrainMaterial.SetFloat("_Speed", speed);
+            terrainMaterial.SetFloat("_Distortion", distortion);
+            terrainMaterial.SetColor("_Color1", color1);
+            terrainMaterial.SetColor("_Color2", color2);
+            terrainMaterial.SetColor("_Color3", color3);
+        }
+    }
+
+    protected virtual void GenerateTerrain()
     {
         // Create the terrain
         DestroyImmediate(terrainMesh);
@@ -58,6 +91,14 @@ public class TerrainGenerator : MonoBehaviour
         terrainMeshFilter.mesh = terrainMesh;
 
         // Generate terrain information
+        GenerateTerrainMesh();
+
+        // Update terrain material and textures
+        GenerateTextures();
+    }
+
+    protected virtual void GenerateTerrainMesh()
+    {
         int numVertices = terrainWidth * terrainDepth;
         Vector3[] vertices = new Vector3[numVertices];
         Vector2[] uv = new Vector2[numVertices];
@@ -102,8 +143,10 @@ public class TerrainGenerator : MonoBehaviour
         terrainMesh.triangles = triangles;
         terrainMesh.RecalculateNormals();
         terrainMesh.RecalculateBounds();
+    }
 
-        // Update terrain material and textures
+    protected virtual void GenerateTextures()
+    {
         DestroyImmediate(terrainMaterial);
         terrainMaterial = new Material(terrainShader);
         terrainRenderer.material = terrainMaterial;
