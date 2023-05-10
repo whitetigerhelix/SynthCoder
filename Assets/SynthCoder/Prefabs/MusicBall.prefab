@@ -24,7 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 992617450491540251}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -44,18 +44,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a505753f3b283d40a1612af565bf760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereRadius: 2
+  sphereRadius: 0.75
+  sphereDivisions: 32
   sphereMaterial: {fileID: 2100000, guid: 7cbdbbdecadf5f24bb56728a2ffc0206, type: 2}
   castShadows: 0
-  Speed: 4.44
+  Speed: 3.52
   Scale: 1
-  Distortion: 0.1
-  DistortionSpeed: 4.44
+  Distortion: 0.36
+  DistortionSpeed: 1.17
   Color1: {r: 1, g: 0.5, b: 0, a: 1}
   Color2: {r: 1, g: 0, b: 0.5, a: 1}
   Color3: {r: 1, g: 1, b: 0, a: 1}
-  numRings: 10
-  numSegments: 20
-  amplitude: 1
-  frequency: 1
-  damping: 0.5
+  numRings: 20
+  numSegments: 80
+  amplitude: 75
+  frequency: 20
+  damping: 1
+  peakRadius: 2.66
+  smoothness: 0.5
+  scrollSpeed: 1
+  noiseTexture: {fileID: 0}

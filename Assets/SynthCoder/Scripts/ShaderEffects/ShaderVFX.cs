@@ -65,7 +65,7 @@ namespace SynthCoder
         protected virtual void CreateSphere()
         {
             //sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            GameObject sphere = new GameObject("Sphere");
+            sphere = new GameObject("SphereMesh");
             sphere.transform.SetParent(transform);
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localRotation = Quaternion.identity;

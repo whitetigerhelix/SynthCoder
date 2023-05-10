@@ -327,6 +327,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MusicBall
       objectReference: {fileID: 0}
+    - target: {fileID: 3432042440483462086, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
+      propertyPath: noiseTexture
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8001561610336816057, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -337,7 +341,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8001561610336816057, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 8001561610336816057, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -521,6 +525,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SlitScanEffect
       objectReference: {fileID: 0}
+    - target: {fileID: 172282196314849200, guid: 2dfbbf82661af714bb0197b51760ef8f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2dfbbf82661af714bb0197b51760ef8f, type: 3}
 --- !u!1001 &1769022780945864183
@@ -655,6 +663,10 @@ PrefabInstance:
     - target: {fileID: 5772308408305534690, guid: c61154466ae8dfc44b0cd45df25f8885, type: 3}
       propertyPath: m_Name
       value: FlyOverTerrain
+      objectReference: {fileID: 0}
+    - target: {fileID: 5772308408305534690, guid: c61154466ae8dfc44b0cd45df25f8885, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9161252195246602810, guid: c61154466ae8dfc44b0cd45df25f8885, type: 3}
       propertyPath: m_RootOrder
