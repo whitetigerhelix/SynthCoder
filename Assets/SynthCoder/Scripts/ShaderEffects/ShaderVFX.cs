@@ -24,7 +24,7 @@ namespace SynthCoder
         protected GameObject sphere;
         protected MeshFilter meshFilter;
         protected Mesh sphereMesh => meshFilter.mesh;
-        protected Renderer sphereRenderer;
+        protected MeshRenderer sphereRenderer;
         public Material RendererMaterial => sphereRenderer.material;
 
         protected Texture2D dynamicTexture;
@@ -71,13 +71,11 @@ namespace SynthCoder
             sphere.transform.localRotation = Quaternion.identity;
 
             // Get or create MeshFilter/Renderer
-            meshFilter = sphere.GetComponent<MeshFilter>();
-            if (meshFilter == null)
+            if (!sphere.TryGetComponent<MeshFilter>(out meshFilter))
             {
                 meshFilter = sphere.AddComponent<MeshFilter>();
             }
-            sphereRenderer = sphere.GetComponent<MeshRenderer>();
-            if (sphereRenderer == null)
+            if (!sphere.TryGetComponent<MeshRenderer>(out sphereRenderer))
             {
                 sphereRenderer = sphere.AddComponent<MeshRenderer>();
             }

@@ -327,10 +327,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MusicBall
       objectReference: {fileID: 0}
-    - target: {fileID: 3432042440483462086, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
-      propertyPath: noiseTexture
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 8001561610336816057, guid: 67e466d37379e5745bfef086f2a4ab6c, type: 3}
       propertyPath: m_RootOrder
       value: 8
