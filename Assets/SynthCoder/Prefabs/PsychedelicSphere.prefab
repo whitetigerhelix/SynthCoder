@@ -44,11 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2845b418bcf9c46a323ed614bf55cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereRadius: 2
+  sphereRadius: 2.5
+  sphereDivisions: 32
   sphereMaterial: {fileID: 2100000, guid: 7cbdbbdecadf5f24bb56728a2ffc0206, type: 2}
+  castShadows: 0
   Speed: 1
   Scale: 1
-  Distortion: 1
+  Distortion: 0.2
   DistortionSpeed: 1
   Color1: {r: 1, g: 0.5, b: 0, a: 1}
   Color2: {r: 1, g: 0, b: 0.5, a: 1}

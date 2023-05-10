@@ -16,6 +16,8 @@ namespace SynthCoder
     public class ShaderVFX : MonoBehaviour
     {
         public float sphereRadius = 1.0f;
+        public int sphereDivisions = 32;
+
         public Material sphereMaterial;
         public bool castShadows = false;    // Set during CreateSphere
 
@@ -62,17 +64,28 @@ namespace SynthCoder
 
         protected virtual void CreateSphere()
         {
-            sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            GameObject sphere = new GameObject("Sphere");
             sphere.transform.SetParent(transform);
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localRotation = Quaternion.identity;
-            sphere.transform.localScale = new Vector3(sphereRadius, sphereRadius, sphereRadius);
 
-            // Get the MeshFilter component and mesh from the sphere
+            // Get or create MeshFilter/Renderer
             meshFilter = sphere.GetComponent<MeshFilter>();
+            if (meshFilter == null)
+            {
+                meshFilter = sphere.AddComponent<MeshFilter>();
+            }
+            sphereRenderer = sphere.GetComponent<MeshRenderer>();
+            if (sphereRenderer == null)
+            {
+                sphereRenderer = sphere.AddComponent<MeshRenderer>();
+            }
+
+            // Generate a new sphere mesh with the given radius and number of divisions
+            meshFilter.mesh = SacredGeometryGenerator.GenerateSphereMesh(sphereRadius, sphereDivisions);
 
             // Create a new instance of the material and assign it to the sphere
-            sphereRenderer = sphere.GetComponent<Renderer>();
             if (sphereMaterial != null)
             {
                 sphereRenderer.material = new Material(sphereMaterial);

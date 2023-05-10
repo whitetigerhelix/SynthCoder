@@ -505,10 +505,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PsychedelicSphere
       objectReference: {fileID: 0}
-    - target: {fileID: 5052322873527675153, guid: de49fd2bb3215c041bf3d4b290ada15b, type: 3}
-      propertyPath: sphereRadius
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 8001561610336816057, guid: de49fd2bb3215c041bf3d4b290ada15b, type: 3}
       propertyPath: m_RootOrder
       value: 3

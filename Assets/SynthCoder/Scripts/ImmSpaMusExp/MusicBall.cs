@@ -53,17 +53,24 @@ namespace SynthCoder
 
                 // Calculate the distance of the vertex from the center of the sphere
                 float distanceFromCenter = Vector3.Distance(vertex, Vector3.zero);
-                distanceFromCenter *= sphereRadius;
 
                 // Calculate the amount to displace the vertex based on the distance from the center and the displacement amount
-                float noiseValue = Mathf.PerlinNoise((vertex.x + Time.time * noiseSpeed) * noiseScale, (vertex.y + Time.time * noiseSpeed) * noiseScale);
-                float displacementAmount = displacement * Mathf.Clamp01((sphereRadius - distanceFromCenter) / (sphereRadius * numRings)) * noiseValue;
+                float displacementAmount = displacement * Mathf.Clamp01((sphereRadius - distanceFromCenter) / (sphereRadius * numRings));
 
                 // Apply damping to the displacement amount to make the effect look smoother
-                displacementAmount *= Mathf.Pow(damping, Time.deltaTime);
+                if (damping > 0f)
+                {
+                    displacementAmount *= Mathf.Pow(damping, Time.deltaTime);
+                }
+
+                // Calculate the blend factor based on the distance from the center
+                float blendFactor = Mathf.Clamp01((sphereRadius - distanceFromCenter) / sphereRadius);
 
                 // Displace the vertex along the normal vector of the vertex
                 displacedVertices[i] = vertex + sphereMesh.normals[i] * displacementAmount;
+
+                // Blend the displaced and original vertices based on the blend factor
+                displacedVertices[i] = Vector3.Lerp(vertex, displacedVertices[i], blendFactor);
             }
 
             // Update the mesh with the displaced vertices
