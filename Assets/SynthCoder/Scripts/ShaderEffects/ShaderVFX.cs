@@ -30,8 +30,6 @@ namespace SynthCoder
         protected Texture2D dynamicTexture;
         protected Color32[] colors;
 
-        protected string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
-
         [Header("Shader Configuration")]
 
         [Range(0.1f, 10f)]
@@ -45,6 +43,8 @@ namespace SynthCoder
         public Color Color1 = new Color(1f, 0.5f, 0f, 1f);
         public Color Color2 = new Color(1f, 0f, 0.5f, 1f);
         public Color Color3 = new Color(1f, 1f, 0f, 1f);
+
+        public string dynamicTextureSavePath = "Assets/SynthCoder/Resources/ProceduralTextures/ShaderVFXTexture.asset";
 
         protected virtual void OnEnable()
         {
