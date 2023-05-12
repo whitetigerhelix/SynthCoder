@@ -191,7 +191,6 @@ namespace SynthCoder
                 TextureGenerator.ExportTextureToFile(noiseTexture, noiseTextureSavePath);
             }
 
-            terrainMaterial.shader = terrainShader;
             terrainMaterial.SetTexture("_MainTex", terrainTexture);
             terrainMaterial.SetTexture("_Gradient", gradientTexture);
             terrainMaterial.SetTexture("_NoiseTex", noiseTexture);
