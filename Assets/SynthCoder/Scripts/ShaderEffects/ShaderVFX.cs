@@ -3,6 +3,7 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
+using System.IO;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -103,30 +104,39 @@ namespace SynthCoder
                 Destroy(dynamicTexture);
             }
 
-            // Create a new Texture2D with the desired dimensions
-            dynamicTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-
-            // Generate colors for each pixel in the texture
-            colors = new Color32[width * height];
-            for (int y = 0; y < height; y++)
+            // Check if a saved texture exists
+            if (File.Exists(dynamicTextureSavePath))
             {
-                for (int x = 0; x < width; x++)
-                {
-                    float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
-                    float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
-                    float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
-                    colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
-                }
+                // Load the existing texture
+                dynamicTexture = TextureGenerator.LoadTextureFromFile(dynamicTextureSavePath);
             }
+            else
+            {
+                // Create a new Texture2D with the desired dimensions
+                dynamicTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
-            // Set the texture pixels
-            dynamicTexture.SetPixels32(colors);
-            dynamicTexture.Apply();
+                // Generate colors for each pixel in the texture
+                colors = new Color32[width * height];
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
+                        float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
+                        float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
+                        colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
+                    }
+                }
+
+                // Set the texture pixels
+                dynamicTexture.SetPixels32(colors);
+                dynamicTexture.Apply();
+
+                TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
+            }
 
             // Assign the dynamic texture to the shader
             RendererMaterial.SetTexture("_MainTex", dynamicTexture);
-
-            TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
         }
 
         protected virtual void UpdateShader()

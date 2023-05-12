@@ -107,6 +107,25 @@ namespace SynthCoder
 
             // Save the new Texture2D to disk using AssetDatabase.CreateAsset()
             AssetDatabase.CreateAsset(savedTexture, savePath);
+#else
+			Debug.LogWarning("ExportTextureToFile is only supported in the Unity Editor.");
+			return null;
+#endif
+        }
+
+        public static Texture2D LoadTextureFromFile(string filePath)
+        {
+#if UNITY_EDITOR
+            // Load the Texture2D from the specified file path using AssetDatabase.LoadAssetAtPath()
+            Texture2D loadedTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(filePath);
+            if (loadedTexture == null)
+            {
+                Debug.LogError("LoadTextureFromFile - Failed to load texture from file: " + filePath);
+            }
+            return loadedTexture;
+#else
+			Debug.LogWarning("LoadTextureFromFile is only supported in the Unity Editor.");
+			return null;
 #endif
         }
     }

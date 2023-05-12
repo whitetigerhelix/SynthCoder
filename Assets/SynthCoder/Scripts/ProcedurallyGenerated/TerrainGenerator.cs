@@ -3,6 +3,7 @@
 // and hope it helps make your programming journey a little easier.
 // Stay curious and keep coding!
 
+using System.IO;
 using UnityEngine;
 
 namespace SynthCoder
@@ -154,17 +155,41 @@ namespace SynthCoder
             terrainMaterial = new Material(terrainShader);
             terrainRenderer.material = terrainMaterial;
 
+            // Terrain
             DestroyImmediate(terrainTexture);
-            terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
-            TextureGenerator.ExportTextureToFile(terrainTexture, terrainTextureSavePath);
+            if (File.Exists(terrainTextureSavePath))
+            {
+                terrainTexture = TextureGenerator.LoadTextureFromFile(terrainTextureSavePath);
+            }
+            else
+            {
+                terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
+                TextureGenerator.ExportTextureToFile(terrainTexture, terrainTextureSavePath);
+            }
 
+            // Gradient
             DestroyImmediate(gradientTexture);
-            gradientTexture = TextureGenerator.GenerateGradientTexture(gradientStartColor, gradientEndColor);
-            TextureGenerator.ExportTextureToFile(gradientTexture, gradientTextureSavePath);
+            if (File.Exists(gradientTextureSavePath))
+            {
+                gradientTexture = TextureGenerator.LoadTextureFromFile(gradientTextureSavePath);
+            }
+            else
+            {
+                gradientTexture = TextureGenerator.GenerateGradientTexture(gradientStartColor, gradientEndColor);
+                TextureGenerator.ExportTextureToFile(gradientTexture, gradientTextureSavePath);
+            }
 
+            // Noise
             DestroyImmediate(noiseTexture);
-            noiseTexture = TextureGenerator.GenerateNoiseTexture();
-            TextureGenerator.ExportTextureToFile(noiseTexture, noiseTextureSavePath);
+            if (File.Exists(noiseTextureSavePath))
+            {
+                noiseTexture = TextureGenerator.LoadTextureFromFile(noiseTextureSavePath);
+            }
+            else
+            {
+                noiseTexture = TextureGenerator.GenerateNoiseTexture();
+                TextureGenerator.ExportTextureToFile(noiseTexture, noiseTextureSavePath);
+            }
 
             terrainMaterial.shader = terrainShader;
             terrainMaterial.SetTexture("_MainTex", terrainTexture);
