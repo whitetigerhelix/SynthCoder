@@ -151,9 +151,19 @@ namespace SynthCoder
 
         protected virtual void GenerateTextures()
         {
-            DestroyImmediate(terrainMaterial);
-            terrainMaterial = new Material(terrainShader);
-            terrainRenderer.material = terrainMaterial;
+#if DESTROY_EXISTING_MATERIAL
+			DestroyImmediate(terrainMaterial);
+			terrainMaterial = null;
+#endif
+            if (terrainRenderer.material == null)
+            {
+                terrainMaterial = new Material(terrainShader);
+                terrainRenderer.material = terrainMaterial;
+            }
+            else
+            {
+                terrainMaterial = terrainRenderer.material;
+            }
 
             // Terrain
             DestroyImmediate(terrainTexture);
