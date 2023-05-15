@@ -132,6 +132,7 @@ namespace SynthCoder
                     sphere.transform.parent = transform;
                     sphere.transform.localPosition = pos;
                     sphere.transform.localScale = Vector3.one * sphereRadius;
+                    sphere.GetComponent<SphereCollider>().enabled = false;
                     spheres[helixIndex].Add(sphere);
 
                     totalHeight = Mathf.Max(totalHeight, pos.y);

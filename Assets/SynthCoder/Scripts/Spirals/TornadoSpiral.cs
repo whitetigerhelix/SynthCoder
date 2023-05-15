@@ -33,6 +33,7 @@ namespace SynthCoder
                 sphere.transform.parent = transform;
                 sphere.transform.localScale = Vector3.one * 0.2f;
                 sphere.GetComponent<Renderer>().material.color = Color.Lerp(colorA, colorB, (float)i / numSpheres);
+                sphere.GetComponent<SphereCollider>().enabled = false;
                 spheres[i] = sphere;
             }
         }

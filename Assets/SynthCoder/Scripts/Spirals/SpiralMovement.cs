@@ -63,6 +63,7 @@ namespace SynthCoder
                 sphere.transform.SetParent(transform);
                 sphere.transform.localPosition = pos;
                 sphere.transform.localScale = Vector3.one * sphereRadius;
+                sphere.GetComponent<SphereCollider>().enabled = false;
 
                 angle += angleStep;
             }
