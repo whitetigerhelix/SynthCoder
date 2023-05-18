@@ -20,7 +20,10 @@ namespace SynthCoder
 		[SerializeField] private Color colorA = Color.red;
         [SerializeField] private Color colorB = Color.blue;
 
-        private GameObject[] spheres;
+		[SerializeField, Tooltip("Prefab for a sphere - if unset, will generate a primitive")]
+		private GameObject spherePrefab;
+
+		private GameObject[] spheres;
         private float increment;
         private float phase;
 
@@ -32,9 +35,11 @@ namespace SynthCoder
             phase = 0.0f;
 
             for (int i = 0; i < NumSpheres; i++)
-            {
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere.transform.parent = transform;
+			{
+				GameObject sphere = spherePrefab != null ?
+					Instantiate(spherePrefab) :
+					GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				sphere.transform.parent = transform;
                 sphere.transform.localScale = Vector3.one * 0.2f;
                 sphere.GetComponent<Renderer>().material.color = Color.Lerp(colorA, colorB, (float)i / NumSpheres);
                 sphere.GetComponent<SphereCollider>().enabled = false;

@@ -61,6 +61,9 @@ namespace SynthCoder
         [Tooltip("The speed at which the spheres rotate around the vertical axis.")]
         public float rotationSpeed = 10f;
 
+		[Tooltip("Prefab for a sphere - if unset, will generate a primitive")]
+		public GameObject spherePrefab;
+
         private List<List<GameObject>> spheres;
         private float totalHeight;
 
@@ -128,7 +131,9 @@ namespace SynthCoder
                 for (int sphereIndex = 0; sphereIndex < numSpheres; sphereIndex++)
                 {
                     Vector3 pos = GetSpherePosition(helixIndex, sphereIndex);
-                    GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    GameObject sphere = spherePrefab != null ?
+						Instantiate(spherePrefab) :
+						GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     sphere.transform.parent = transform;
                     sphere.transform.localPosition = pos;
                     sphere.transform.localScale = Vector3.one * sphereRadius;
