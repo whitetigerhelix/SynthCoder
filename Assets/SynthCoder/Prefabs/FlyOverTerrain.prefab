@@ -54,7 +54,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: d9f809e58ab359e45a9e39ae2ac0afa2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -112,6 +112,9 @@ MonoBehaviour:
   color1: {r: 0.6, g: 0.007, b: 0.007, a: 1}
   color2: {r: 0.04, g: 0, b: 1, a: 1}
   color3: {r: 1, g: 0.37, b: 0, a: 1}
+  terrainTextureSavePath: Assets/SynthCoder/Resources/ProceduralTextures/TerrainTexture.asset
+  gradientTextureSavePath: Assets/SynthCoder/Resources/ProceduralTextures/GradientTexture.asset
+  noiseTextureSavePath: Assets/SynthCoder/Resources/ProceduralTextures/NoiseTexture.asset
   scrollDirection: {x: 1, y: 1}
   scrollSpeed: 50
   cameraTilt: {fileID: 0}
