@@ -155,18 +155,18 @@ namespace SynthCoder
 			DestroyImmediate(terrainMaterial);
 			terrainMaterial = null;
 #endif
-            if (terrainRenderer.material == null)
-            {
-                terrainMaterial = new Material(terrainShader);
-                terrainRenderer.material = terrainMaterial;
-            }
-            else
-            {
-                terrainMaterial = terrainRenderer.material;
-            }
+			if (terrainRenderer.material == null)
+			{
+				terrainMaterial = new Material(terrainShader);
+				terrainRenderer.material = terrainMaterial;
+			}
+			else
+			{
+				terrainMaterial = terrainRenderer.material;
+			}
 
-            // Terrain
-            DestroyImmediate(terrainTexture);
+			// Terrain
+			DestroyImmediate(terrainTexture);
             if (File.Exists(terrainTextureSavePath))
             {
                 terrainTexture = TextureGenerator.LoadTextureFromFile(terrainTextureSavePath);

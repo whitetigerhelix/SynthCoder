@@ -1,0 +1,16 @@
+{
+  "name": "com.synthcoder",
+  "version": "0.0.0",
+  "displayName": "SynthCoder",
+  "description": "SynthCoder aka ChatGPT synthesized all the code and shaders",
+  "unity": "2021.3",
+  "unityRelease": "5f1",
+  "dependencies": {
+  },
+  "keywords": [
+  ],
+  "author": {
+    "name": "SynthCoder",
+    "email": "chrisoje@helionoctis.com"
+  }
+}

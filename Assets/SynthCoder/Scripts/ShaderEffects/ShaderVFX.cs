@@ -94,52 +94,52 @@ namespace SynthCoder
             GenerateTexture();
         }
 
-        // This function generates a new Texture2D with the given dimensions, generates colors for each pixel using Perlin noise,
-        // sets the pixels of the texture, assigns the texture to a shader, and exports the texture to a file. If a previous texture exists,
-        // it is destroyed before creating the new one.
-        public virtual void GenerateTexture(int width = 256, int height = 256)
-        {
-            if (dynamicTexture == null)
-            {
-                Destroy(dynamicTexture);
-            }
+		// This function generates a new Texture2D with the given dimensions, generates colors for each pixel using Perlin noise,
+		// sets the pixels of the texture, assigns the texture to a shader, and exports the texture to a file. If a previous texture exists,
+		// it is destroyed before creating the new one.
+		public virtual void GenerateTexture(int width = 256, int height = 256)
+		{
+			if (dynamicTexture == null)
+			{
+				Destroy(dynamicTexture);
+			}
 
-            // Check if a saved texture exists
-            if (File.Exists(dynamicTextureSavePath))
-            {
-                // Load the existing texture
-                dynamicTexture = TextureGenerator.LoadTextureFromFile(dynamicTextureSavePath);
-            }
-            else
-            {
-                // Create a new Texture2D with the desired dimensions
-                dynamicTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+			// Check if a saved texture exists
+			if (File.Exists(dynamicTextureSavePath))
+			{
+				// Load the existing texture
+				dynamicTexture = TextureGenerator.LoadTextureFromFile(dynamicTextureSavePath);
+			}
+			else
+			{
+				// Create a new Texture2D with the desired dimensions
+				dynamicTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
-                // Generate colors for each pixel in the texture
-                colors = new Color32[width * height];
-                for (int y = 0; y < height; y++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
-                        float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
-                        float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
-                        colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
-                    }
-                }
+				// Generate colors for each pixel in the texture
+				colors = new Color32[width * height];
+				for (int y = 0; y < height; y++)
+				{
+					for (int x = 0; x < width; x++)
+					{
+						float r = Mathf.PerlinNoise(x * 0.1f, y * 0.1f);
+						float g = Mathf.PerlinNoise(x * 0.3f, y * 0.3f);
+						float b = Mathf.PerlinNoise(x * 0.5f, y * 0.5f);
+						colors[x + y * width] = new Color32((byte)(r * 255), (byte)(g * 255), (byte)(b * 255), 255);
+					}
+				}
 
-                // Set the texture pixels
-                dynamicTexture.SetPixels32(colors);
-                dynamicTexture.Apply();
+				// Set the texture pixels
+				dynamicTexture.SetPixels32(colors);
+				dynamicTexture.Apply();
 
-                TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
-            }
+				TextureGenerator.ExportTextureToFile(dynamicTexture, dynamicTextureSavePath);
+			}
 
-            // Assign the dynamic texture to the shader
-            RendererMaterial.SetTexture("_MainTex", dynamicTexture);
-        }
+			// Assign the dynamic texture to the shader
+			RendererMaterial.SetTexture("_MainTex", dynamicTexture);
+		}
 
-        protected virtual void UpdateShader()
+		protected virtual void UpdateShader()
         {
             if (RendererMaterial != null)
             {

@@ -40,6 +40,8 @@ namespace SynthCoder
                 sphere.GetComponent<SphereCollider>().enabled = false;
                 spheres[i] = sphere;
             }
+
+			Debug.Log($"TornadoSpiral - Created {spheres.Length} spheres");
         }
 
         private void Update()
