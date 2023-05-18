@@ -53,9 +53,11 @@ namespace SynthCoder
         protected MeshRenderer terrainRenderer;
         protected MeshFilter terrainMeshFilter;
         protected Material terrainMaterial;
-        protected Texture2D terrainTexture;
-        protected Texture2D gradientTexture;
-        protected Texture2D noiseTexture;
+
+		[Header("Generated Textures")]
+        [SerializeField] protected Texture2D terrainTexture;
+		[SerializeField] protected Texture2D gradientTexture;
+		[SerializeField] protected Texture2D noiseTexture;
 
         protected virtual void Awake()
         {
@@ -149,8 +151,8 @@ namespace SynthCoder
             terrainMesh.RecalculateBounds();
         }
 
-        protected virtual void GenerateTextures()
-        {
+		protected virtual void GenerateTextures()
+		{
 #if DESTROY_EXISTING_MATERIAL
 			DestroyImmediate(terrainMaterial);
 			terrainMaterial = null;
@@ -166,42 +168,63 @@ namespace SynthCoder
 			}
 
 			// Terrain
-			DestroyImmediate(terrainTexture);
-            if (File.Exists(terrainTextureSavePath))
-            {
-                terrainTexture = TextureGenerator.LoadTextureFromFile(terrainTextureSavePath);
-            }
-            else
-            {
-                terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
-                TextureGenerator.ExportTextureToFile(terrainTexture, terrainTextureSavePath);
-            }
+			//DestroyImmediate(terrainTexture);
+			if (terrainTexture == null)
+			{
+#if UNITY_EDITOR
+				if (File.Exists(terrainTextureSavePath))
+				{
+					terrainTexture = TextureGenerator.LoadTextureFromFile(terrainTextureSavePath);
+				}
+				else
+				{
+					terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
+					TextureGenerator.ExportTextureToFile(terrainTexture, terrainTextureSavePath);
+				}
+#else
+				terrainTexture = TextureGenerator.GenerateTerrainTexture(frequency: terrainTextureFrequency);
+#endif
+			}
 
-            // Gradient
-            DestroyImmediate(gradientTexture);
-            if (File.Exists(gradientTextureSavePath))
-            {
-                gradientTexture = TextureGenerator.LoadTextureFromFile(gradientTextureSavePath);
-            }
-            else
-            {
-                gradientTexture = TextureGenerator.GenerateGradientTexture(gradientStartColor, gradientEndColor);
-                TextureGenerator.ExportTextureToFile(gradientTexture, gradientTextureSavePath);
-            }
+			// Gradient
+			//DestroyImmediate(gradientTexture);
+			if (gradientTexture == null)
+			{
+#if UNITY_EDITOR
+				if (File.Exists(gradientTextureSavePath))
+				{
+					gradientTexture = TextureGenerator.LoadTextureFromFile(gradientTextureSavePath);
+				}
+				else
+				{
+					gradientTexture = TextureGenerator.GenerateGradientTexture(gradientStartColor, gradientEndColor);
+					TextureGenerator.ExportTextureToFile(gradientTexture, gradientTextureSavePath);
+				}
+#else
+				gradientTexture = TextureGenerator.GenerateGradientTexture(gradientStartColor, gradientEndColor);
+#endif
+			}
 
-            // Noise
-            DestroyImmediate(noiseTexture);
-            if (File.Exists(noiseTextureSavePath))
-            {
-                noiseTexture = TextureGenerator.LoadTextureFromFile(noiseTextureSavePath);
-            }
-            else
-            {
-                noiseTexture = TextureGenerator.GenerateNoiseTexture();
-                TextureGenerator.ExportTextureToFile(noiseTexture, noiseTextureSavePath);
-            }
+			// Noise
+			//DestroyImmediate(noiseTexture);
+			if (noiseTexture == null)
+			{
+#if UNITY_EDITOR
+				if (File.Exists(noiseTextureSavePath))
+				{
+					noiseTexture = TextureGenerator.LoadTextureFromFile(noiseTextureSavePath);
+				}
+				else
+				{
+					noiseTexture = TextureGenerator.GenerateNoiseTexture();
+					TextureGenerator.ExportTextureToFile(noiseTexture, noiseTextureSavePath);
+				}
+#else
+				noiseTexture = TextureGenerator.GenerateNoiseTexture();
+#endif
+			}
 
-            terrainMaterial.SetTexture("_MainTex", terrainTexture);
+			terrainMaterial.SetTexture("_MainTex", terrainTexture);
             terrainMaterial.SetTexture("_Gradient", gradientTexture);
             terrainMaterial.SetTexture("_NoiseTex", noiseTexture);
         }
