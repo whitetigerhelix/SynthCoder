@@ -137,9 +137,9 @@ namespace SynthCoder
 
                     totalHeight = Mathf.Max(totalHeight, pos.y);
                 }
-            }
 
-			Debug.Log($"HelixSpiral.GenerateSpheres - Created {spheres.Count} spheres");
+				Debug.Log($"HelixSpiral.GenerateSpheres - Helix {helixIndex} - Created {spheres[helixIndex].Count} spheres");
+			}
 		}
 
         private void UpdateSpheres()
